@@ -19,10 +19,10 @@ import Languages from '../../components/Languages';
 import { saveProject } from '../../data/Projects';
 import { getAllTenants } from '../../data/Tenant';
 import { useStore } from '../../hooks/useGlobalStore';
-import { Tenant } from '../../models/clients';
+import { Tenant } from '../../models/Clients';
 import { Doc } from '../../models/document';
 import { Project } from '../../models/project';
-import { ROLES } from '../../models/users';
+import { ROLES } from '../../models/Users';
 import { useAuth } from '../../context/AuthContext';
 
 const initialState: Project = {

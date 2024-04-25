@@ -11,7 +11,7 @@ import firebase, {
   confirmPasswordReset
 } from 'firebase/auth'
 
-import { ROLES } from '../models/users';
+import { ROLES } from '../models/Users';
 import { useStore } from '../hooks/useGlobalStore';
 import { LoggedUser, initialGlobalState } from '../store/initialGlobalState';
 import { getUserById, validateSession } from '../data/users';

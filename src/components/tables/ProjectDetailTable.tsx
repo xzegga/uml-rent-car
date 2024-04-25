@@ -7,7 +7,7 @@ import {
 import { useStore } from '../../hooks/useGlobalStore';
 import useProjectExtras from '../../hooks/useProjectExtras';
 import { ProjectObject } from '../../models/project';
-import { ROLES } from '../../models/users';
+import { ROLES } from '../../models/Users';
 import { transfromTimestamp } from '../../utils/helpers';
 import Flag from '../Flag';
 

@@ -20,7 +20,7 @@ import { getProjectById } from '../../data/Projects';
 import Urgent from '../../assets/isUrgent.svg?react';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import JSZip from 'jszip';
-import { ROLES } from '../../models/users';
+import { ROLES } from '../../models/Users';
 import { useStore } from '../../hooks/useGlobalStore';
 import ChangeStatusSelector from '../../components/ChangeStatus';
 

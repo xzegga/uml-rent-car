@@ -13,7 +13,7 @@ import Urgent from '../../assets/isUrgent.svg?react';
 import { useStore } from '../../hooks/useGlobalStore';
 import useProjectExtras from '../../hooks/useProjectExtras';
 import { ProjectObject } from '../../models/project';
-import { ROLES } from '../../models/users';
+import { ROLES } from '../../models/Users';
 import { shortenName, transfromTimestamp } from '../../utils/helpers';
 import Flag from '../Flag';
 import Status from '../Status';

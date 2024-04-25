@@ -5,7 +5,7 @@ import 'firebase/functions'; // Import the functions module
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { db } from '../../utils/init-firebase';
-import { ROLES } from '../../models/users';
+import { ROLES } from '../../models/Users';
 import { useStore } from '../../hooks/useGlobalStore';
 import MaxTextTooltip from '../../components/MaxTextTooltip';
 import TenantDropdown from '../../components/TenantDropdown';

@@ -1,5 +1,5 @@
 import { Timestamp, addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
-import { Tenant } from '../models/clients';
+import { Tenant } from '../models/Clients';
 import { db, storage } from '../utils/init-firebase';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { getFunctions, httpsCallable } from 'firebase/functions';

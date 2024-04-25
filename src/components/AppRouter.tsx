@@ -12,7 +12,7 @@ import Registre from '../pages/Registre';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
 import Tenants from '../pages/admin/Tenants';
-import { ROLES } from '../models/users';
+import { ROLES } from '../models/Users';
 
 
 const AppRouter: React.FC = () => {

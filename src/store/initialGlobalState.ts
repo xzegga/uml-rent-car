@@ -1,6 +1,6 @@
 import { User } from "../context/AuthContext";
-import { Tenant } from "../models/clients";
-import { ROLES } from "../models/users";
+import { Tenant } from "../models/Clients";
+import { ROLES } from "../models/Users";
 
 export const localStorageKeys = [];
 export const sessionStorageKeys = [];

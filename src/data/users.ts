@@ -2,7 +2,7 @@ import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../utils/init-firebase';
 import { LoggedUser } from '../store/initialGlobalState';
 import { removeUndefinedProps } from '../utils/removeUndefined';
-import { ROLES } from '../models/users';
+import { ROLES } from '../models/Users';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 
 export const getAllUsers = async () => {

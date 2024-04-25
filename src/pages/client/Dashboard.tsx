@@ -16,7 +16,7 @@ import { deleteProject } from '../../data/Projects';
 import { useStore } from '../../hooks/useGlobalStore';
 import useProjectExtras from '../../hooks/useProjectExtras';
 import { ProjectObject } from '../../models/project';
-import { ROLES } from '../../models/users';
+import { ROLES } from '../../models/Users';
 import { exportToExcel } from '../../utils/export';
 import { generateYears } from '../../utils/helpers';
 import { allStatuses, monthNames } from '../../utils/value-objects';

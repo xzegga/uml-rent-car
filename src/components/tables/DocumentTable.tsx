@@ -8,7 +8,7 @@ import { DocumentObject, ProcessedDocument } from '../../models/document';
 import { AiOutlineDownload, AiOutlineSafetyCertificate } from 'react-icons/ai';
 import { DeleteIcon } from '@chakra-ui/icons';
 import { deleteDocument } from '../../data/Documents';
-import { ROLES } from '../../models/users';
+import { ROLES } from '../../models/Users';
 import { useStore } from '../../hooks/useGlobalStore';
 
 interface DocumentsTableProps {

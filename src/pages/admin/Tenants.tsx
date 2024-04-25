@@ -7,11 +7,11 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from 'react';
 import { NavLink } from "react-router-dom";
-import { Tenant } from "../../models/clients";
+import { Tenant } from "../../models/Clients";
 import { useDropzone } from "react-dropzone";
 import { AiOutlineCloudUpload, AiOutlineEdit } from "react-icons/ai";
 import { useStore } from "../../hooks/useGlobalStore";
-import { ROLES } from "../../models/users";
+import { ROLES } from "../../models/Users";
 import { getAllTenants, getImageUrl, saveTenant, updateTenant } from "../../data/Tenant";
 import { toPascalCase } from "../../utils/toPascalCase";
 import { transfromTimestamp } from "../../utils/helpers";

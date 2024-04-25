@@ -4,7 +4,7 @@ import { Box, Center, Flex, Spinner, Table, Tbody, Td, Th, Thead, Tr } from '@ch
 
 import { useStore } from '../../hooks/useGlobalStore';
 import { ProjectObject } from '../../models/project';
-import { ROLES } from '../../models/users';
+import { ROLES } from '../../models/Users';
 import ProjectRow from './ProjectRow';
 
 interface ProjectListTableProps {

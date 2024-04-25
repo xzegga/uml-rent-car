@@ -1,8 +1,8 @@
 import { Select } from "@chakra-ui/react";
 import { useStore } from "../hooks/useGlobalStore"
-import { ROLES } from "../models/users";
+import { ROLES } from "../models/Users";
 import { useEffect } from "react";
-import { Tenant } from "../models/clients";
+import { Tenant } from "../models/Clients";
 import { getAllTenants } from "../data/Tenant";
 import { useAuth } from "../context/AuthContext";
 

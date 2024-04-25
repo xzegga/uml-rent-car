@@ -6,7 +6,7 @@ import { Project } from '../models/project';
 import { twoDigitDate } from '../utils/helpers';
 import { db, storage } from '../utils/init-firebase';
 import { saveDocuments } from './Documents';
-import { Tenant } from '../models/clients';
+import { Tenant } from '../models/Clients';
 
 export const getProjectById = async (projectId: string) => {
     const docRef = doc(collection(db, 'projects'), projectId);
