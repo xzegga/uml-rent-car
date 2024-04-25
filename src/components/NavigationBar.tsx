@@ -30,7 +30,7 @@ const NavigationBar: React.FC = () => {
         const importSvgIcon = async (): Promise<void> => {
             try {
                 const tenant = await getTenantBySlug(currentUser.tenant)
-                if(tenant) setState({tenant})
+                if (tenant) setState({ tenant })
                 if (tenant?.image) {
                     const src = await getImageUrl(tenant.image);
                     if (src) setLogo(src);
@@ -69,23 +69,22 @@ const NavigationBar: React.FC = () => {
                 maxW='container.lg'
                 mx='auto'
                 spacing={4}
+                pl={8}
             >
-                <Image src={Logo} maxH="50px" />
+                <Image src={Logo} maxH="60px" />
                 <Spacer />
                 {currentUser && (
                     <>
                         <Flex align='center' justify='left'>
 
-                            <Flex alignItems={'center'} mr={4}>
-                                <Box mr={2}>
-                                    <>{logo && <Image src={logo} maxH={65} />}</>
-                                </Box>
-                            </Flex>
+                            <Box pl={5}>
+                                <>{logo && <Image src={logo} maxH={65} />}</>
+                            </Box>
 
                             {currentUser && currentUser?.photoURL && <Image borderRadius='full' boxSize='35px' src={currentUser?.photoURL} mt="0" />}
                             <Text mt={0} fontSize="sm" fontWeight="semibold" lineHeight="short" pl="2">
                                 {currentUser?.displayName && (<span>{currentUser?.displayName} <br /></span>)}
-                                <Navlnk to='/logout' name='Logout' p="0" m="0" maxH="18px"
+                                <Navlnk to='/logout' name='Salir' p="0" m="0" maxH="18px"
                                     onClick={logoutFn}
                                 />
                             </Text>

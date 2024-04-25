@@ -157,13 +157,10 @@ const Tenants: React.FC = () => {
                         <Box>
                             <Breadcrumb separator='/'>
                                 <BreadcrumbItem>
-                                    <Text>Home</Text>
+                                    <NavLink to='/admin'>Inicio</NavLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbItem>
-                                    <NavLink to='/admin'>Project Dashboard</NavLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbItem>
-                                    <Text>Clients</Text>
+                                    <Text>Clientes</Text>
                                 </BreadcrumbItem>
                             </Breadcrumb>
                         </Box>

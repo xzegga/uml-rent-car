@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { Box, Button, chakra, Container, FormControl, FormLabel, HStack, Input, Stack, useToast, Image } from '@chakra-ui/react'
+import { Box, Button, chakra, Container, FormControl, FormLabel, HStack, Input, Stack, useToast, Image, Flex } from '@chakra-ui/react'
 import { FaGoogle } from 'react-icons/fa';
 
 import DividerWithText from '../components/DividerWithText';
@@ -33,7 +33,7 @@ const Login: React.FC = () => {
         goToPage();
     }, [currentUser])
 
-    const goToPage = ()=>{
+    const goToPage = () => {
         if (currentUser?.uid && currentUser?.role) {
             navigate(`/${currentUser?.role}/`, { replace: false })
         }
@@ -79,8 +79,8 @@ const Login: React.FC = () => {
                         <Container centerContent maxWidth={'440px'} w={'100%'} h={'100%'} >
                             <Card mx='auto' my={'auto'} >
 
-                                <Container centerContent pt={'10px'} pb={'30px'} >
-                                    <Image src={Logo} minW="300px" />
+                                <Container centerContent pt={'10px'} pb={'60px'} >
+                                    <Image src={Logo} minW="188px" />
                                 </Container>
 
                                 <chakra.form
@@ -88,26 +88,33 @@ const Login: React.FC = () => {
                                 >
                                     <Stack spacing='6'>
                                         <FormControl id='email'>
-                                            <FormLabel>Correo electrónico</FormLabel>
-                                            <Input
-                                                name='email'
-                                                type='email'
-                                                autoComplete='email'
-                                                required
-                                                value={email}
-                                                onChange={e => setEmail(e.target.value)}
-                                            />
+                                            <HStack>
+                                                <FormLabel minW={85}>Email</FormLabel>
+                                                <Input
+                                                    name='email'
+                                                    type='email'
+                                                    autoComplete='email'
+                                                    required
+                                                    value={email}
+                                                    onChange={e => setEmail(e.target.value)}
+                                                    w={210}
+
+                                                />
+                                            </HStack>
                                         </FormControl>
-                                        <FormControl id='password'>
-                                            <FormLabel>Contraseña</FormLabel>
-                                            <Input
-                                                name='password'
-                                                type='password'
-                                                autoComplete='password'
-                                                value={password}
-                                                required
-                                                onChange={e => setPassword(e.target.value)}
-                                            />
+                                        <FormControl id='password'  minW={85}>
+                                            <HStack>
+                                                <FormLabel>Contraseña</FormLabel>
+                                                <Input
+                                                    name='password'
+                                                    type='password'
+                                                    autoComplete='password'
+                                                    value={password}
+                                                    required
+                                                    onChange={e => setPassword(e.target.value)}
+                                                    w={210}
+                                                />
+                                            </HStack>
                                         </FormControl>
                                         <Button
                                             type='submit'
@@ -115,21 +122,21 @@ const Login: React.FC = () => {
                                             bg='blue.700'
                                             size='lg'
                                             fontSize='md'
-                                            isLoading={isSubmitting}
+                                            isLoading={isSubmitting}                                            
                                         >
                                             Ingresar
                                         </Button>
                                     </Stack>
                                 </chakra.form>
-                                <HStack justifyContent='space-between' my={4}>
+                                <Flex my={4} justifyContent={'space-between'}>
                                     <Button variant='link'>
                                         <Link to='/forgot-password'>¿Olvidó su contraseña?</Link>
                                     </Button>
                                     <Button variant='link' onClick={() => navigate('/register')}>
                                         Registrarse
                                     </Button>
-                                </HStack>
-                                <DividerWithText my={6}>OR</DividerWithText>
+                                </Flex>
+                                <DividerWithText my={6}>ó</DividerWithText>
                                 <Button
                                     variant='outline'
                                     width='100%'

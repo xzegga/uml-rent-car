@@ -22,7 +22,7 @@ export const initialGlobalState = {
   title: 'Lets start',
   monthSelected: new Date().getMonth(),
   yearSelected: new Date().getFullYear(),
-  status: 'Active',
+  status: 'Activo',
   pagination: '20',
   loading: false,
   loadingMore: false,

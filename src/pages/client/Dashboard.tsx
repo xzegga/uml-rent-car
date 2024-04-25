@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import {
     AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader,
     AlertDialogOverlay, Box, Button, Center, Container, Flex, FormControl, FormLabel, Heading,
-    Input, Link, Select, Spacer, Tag, TagLabel, Text, useToast
+    Link, Select, Spacer, Tag, TagLabel, Text, useToast
 } from '@chakra-ui/react';
 
 import NavLnk from '../../components/NavLnk';
@@ -24,8 +24,8 @@ import { useAuth } from '../../context/AuthContext';
 import ChangeStatusSelector from '../../components/ChangeStatus';
 
 const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ]
 
 const Dashboard: React.FC = () => {
@@ -216,7 +216,7 @@ const Dashboard: React.FC = () => {
                         <Flex mb="1" alignItems={'center'}>
                             <Heading size="md" whiteSpace={'nowrap'} pl={3}>
                                 <Flex alignItems={'center'} gap={3}>
-                                    <Text>Project List</Text>
+                                    <Text>Autos Rentados</Text>
                                     {currentUser.role === 'admin' || tenant.export &&
                                         <TenantDropdown
                                             value={tenantQuery || currentUser.tenant}
@@ -230,24 +230,24 @@ const Dashboard: React.FC = () => {
                                 <Flex>
 
                                     <Link onClick={() => navigate('users', { replace: true })} colorScheme={'blue.700'} mr={5}>
-                                        Manage Users
+                                        Usuarios
                                     </Link>
                                     <Link onClick={() => navigate('clients', { replace: true })} colorScheme={'blue.700'} mr={5}>
-                                        Manage Clients
+                                        Clientes
                                     </Link>
                                 </Flex>
                             )}
                             <Box>
-                                <NavLnk to="projects/add" name="New Project" colorScheme="blue.500" bg="blue.700" size="md" color="white">
-                                    New Project
+                                <NavLnk to="projects/add" name="Nueva Reserva" colorScheme="blue.500" bg="blue.700" size="md" color="white">
+                                    Rentar Nuevo
                                 </NavLnk>
                             </Box>
                         </Flex>
 
                         <Box pt={10}>
                             <Box>
-                                <Flex>
-                                    <FormControl id="requestNumber" ml={2}>
+                                <Flex justifyContent={'flex-end'}>
+                                    {/* <FormControl id="requestNumber" ml={2}>
                                         <Flex alignItems={'center'} justifyContent={'start'}>
                                             <FormLabel my={0}>Request</FormLabel>
                                             <Input w={75}
@@ -258,10 +258,10 @@ const Dashboard: React.FC = () => {
                                                     setRequest(e.target.value)
                                                 }}></Input>
                                         </Flex>
-                                    </FormControl>
-                                    <FormControl id="year_selection" ml={3}>
+                                    </FormControl> */}
+                                    <FormControl id="year_selection" ml={3} maxW={140}>
                                         <Flex alignItems={'center'} justifyContent={'start'}>
-                                            <FormLabel my={0}>Year</FormLabel>
+                                            <FormLabel my={0}>Año</FormLabel>
                                             <Select
                                                 w={90}
                                                 ml={1}
@@ -278,9 +278,9 @@ const Dashboard: React.FC = () => {
                                             </Select>
                                         </Flex>
                                     </FormControl>
-                                    <FormControl id="month_selection" ml={3}>
+                                    <FormControl id="month_selection" ml={6}>
                                         <Flex alignItems={'center'} justifyContent={'start'}>
-                                            <FormLabel my={0}>Month</FormLabel>
+                                            <FormLabel my={0}>Mes</FormLabel>
                                             <Select minW={140} ml={1} name={'monthSelected'} id={'monthSelected'} value={monthSelected} onChange={handleFilterDate}>
                                                 {/* <option value={-1}>All</option> */}
                                                 {monthNames.map((s, index) => (
@@ -291,9 +291,9 @@ const Dashboard: React.FC = () => {
                                             </Select>
                                         </Flex>
                                     </FormControl>
-                                    <FormControl id="language_requested" ml={3}>
+                                    <FormControl id="language_requested" ml={6}>
                                         <Flex alignItems={'center'} justifyContent={'start'}>
-                                            <FormLabel my={0}>Status</FormLabel>
+                                            <FormLabel my={0}>Estado</FormLabel>
                                             <Select minW={140} ml={1} name={'status'} id={'status'} value={status} onChange={handleFilter}>
                                                 {allStatuses.map((s: string, index) => (
                                                     <option key={index} value={s}>
@@ -308,9 +308,9 @@ const Dashboard: React.FC = () => {
                                             </Select>
                                         </Flex>
                                     </FormControl>
-                                    <FormControl id="page_size" ml={3}>
+                                    <FormControl id="page_size" ml={6}>
                                         <Flex alignItems={'center'} justifyContent={'start'}>
-                                            <FormLabel my={0}>Page</FormLabel>
+                                            <FormLabel my={0}>Mostrar</FormLabel>
                                             <Select w={'70px'} ml={1} name={'page'} id={'page'}
                                                 value={pagination} onChange={(e) => setState({ pagination: e.target.value })}>
                                                 {['All', '10', '20', '50'].map((s: string, index) =>
@@ -328,9 +328,9 @@ const Dashboard: React.FC = () => {
                             <Flex gap={4} pt={5} pl={0} alignItems={'center'}>
                                 {[
                                     { Request: requestdb },
-                                    { Year: yearSelected },
-                                    { Month: monthSelected },
-                                    { Status: status }
+                                    { 'Año': yearSelected },
+                                    { Mes: monthSelected },
+                                    { Estado: status }
                                 ].map((obj, index) => (
                                     <Box key={index}>
                                         {
@@ -339,7 +339,7 @@ const Dashboard: React.FC = () => {
                                                     <Tag size={'sm'} key={index} variant='outline' colorScheme='blue'>
                                                         <TagLabel>{Object.keys(obj)[0]}: {Object.values(obj)[0]}</TagLabel>
                                                     </Tag>
-                                                    <Text fontSize={'xs'}>Ignored Filters:</Text>
+                                                    <Text fontSize={'xs'}>Filtros Ignorados:</Text>
                                                 </Flex> :
                                                 <>{
                                                     !['', -1,].includes(Object.values(obj)[0]) ?
@@ -364,7 +364,7 @@ const Dashboard: React.FC = () => {
                                             color={'green.500'}
                                             leftIcon={<AiOutlineFileExcel />}
                                             onClick={exportToExcelFn}
-                                        >Export to Excel</Button>
+                                        >Exportar a Excel</Button>
                                     </Flex>
                                     : null}
 
@@ -375,7 +375,7 @@ const Dashboard: React.FC = () => {
                                 color={'black'} overflow={'hidden'} mt={4}>
                                 <Flex alignItems={'center'} gap={3} py={2} px={4}
                                 >
-                                    <Text>Change Status</Text>
+                                    <Text>Cambiar Estado</Text>
                                     <ChangeStatusSelector ids={selectedIds} onSuccess={onChangeStatusSuccess} />
                                 </Flex>
                             </Box>
@@ -386,12 +386,12 @@ const Dashboard: React.FC = () => {
                                 removeProject={removeProject} />
                             <Spacer mt={10} />
                             <Center>
-                                Showing {projects.length} of {count ? count : 0} projects
+                                Mostrando {projects.length} de {count ? count : 0} autos rentados
                             </Center>
                             <Center>
                                 {count && count > projects.length && (
                                     <Link onClick={fetchMore} color={'blue.700'}>
-                                        Load More...
+                                        Cargar más...
                                     </Link>
                                 )}
                             </Center>
@@ -402,17 +402,17 @@ const Dashboard: React.FC = () => {
                         <AlertDialogOverlay>
                             <AlertDialogContent>
                                 <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                                    Delete Project {project?.data.projectId}
+                                    Borrar {project?.data.projectId}
                                 </AlertDialogHeader>
 
                                 <AlertDialogBody>Are you sure to delete this project? All related files will be deleted and you can't undo this action afterward.</AlertDialogBody>
 
                                 <AlertDialogFooter>
                                     <Button ref={cancelRef} onClick={onClose}>
-                                        Cancel
+                                        Cancelar
                                     </Button>
                                     <Button colorScheme="red" onClick={handleDeleteProject} ml={3}>
-                                        Delete
+                                        Eliminar
                                     </Button>
                                 </AlertDialogFooter>
                             </AlertDialogContent>

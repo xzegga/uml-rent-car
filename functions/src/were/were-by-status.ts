@@ -13,7 +13,7 @@ const getWereByStatus = async (
       value: statuses,
     });
     break;
-  case "Active":
+  case "Activo":
     whereClause.push({
       field: "status",
       operator: "in",

@@ -162,13 +162,10 @@ const Users: React.FC = () => {
                     <Box>
                         <Breadcrumb separator='/'>
                             <BreadcrumbItem>
-                                <Text>Home</Text>
+                                <NavLink to='/admin'>Inicio</NavLink>
                             </BreadcrumbItem>
                             <BreadcrumbItem>
-                                <NavLink to='/admin'>Project Dashboard</NavLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbItem>
-                                <Text>Users</Text>
+                                <Text>Usuarios</Text>
                             </BreadcrumbItem>
                         </Breadcrumb>
                     </Box>

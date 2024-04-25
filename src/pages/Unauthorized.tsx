@@ -23,15 +23,15 @@ const Unauthorized: React.FC = () => {
                 <Card mx='auto' my={'auto'} >
 
                     <Container centerContent pt={'10px'} pb={'30px'} >
-                        <Image src={Logo} minW="300px" />
+                        <Image src={Logo} minW="180px" />
                     </Container>
 
                     <Container centerContent pt={'10px'} pb={'30px'} >
                         <Heading as="h2" size="lg" textAlign={'center'}>
-                            You are not authorized to view this page.
+                            No estás autorizado para ver esta página.
                         </Heading>
-                        <Text textAlign={'center'}>Please contact a Translationlinks Administrator to allow your to use this content</Text>
-                        <Navlnk to='/logout' name='Logout' py="10" m="0" maxH="18px"
+                        <Text textAlign={'center'} pt={5}>Por favor, contacta a un administrador de UML RentCar para que te permitan usar este contenido</Text>
+                        <Navlnk to='/logout' name='Salir' py="10" m="0" maxH="18px"
                             onClick={logoutFn}
                         />
                     </Container>

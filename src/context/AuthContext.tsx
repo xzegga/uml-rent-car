@@ -118,7 +118,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ childr
           photoUrl: usr.photoURL,
           email: usr.email,
           uid: usr.uid,
-          role: 'admin', //claims.role || ROLES.Unauthorized,
+          role: claims.role || ROLES.Unauthorized,
           tenant: claims.tenant,
           department: claims.department,
         } as LoggedUser
