@@ -14,14 +14,14 @@ export default async function setRoles(request: CallableRequest<any>) {
   const {email, customClaims, token} = request.data;
 
   if (!email || !customClaims || !token) {
-    return new HttpsError("invalid-argument", "Missing required fields");
+    return new HttpsError("invalid-argument", "Faltan campos requeridos");
   }
 
   const auth = getAuth();
   const validToken: DecodedIdToken = await auth.verifyIdToken(token);
 
   if (!validToken || validToken.role !== "admin") {
-    return new HttpsError("internal", "Permissions denied");
+    return new HttpsError("internal", "Permiso denegado");
   }
 
   try {
@@ -31,11 +31,14 @@ export default async function setRoles(request: CallableRequest<any>) {
       ...customClaims,
     });
 
-    return {message: "Claims assigned successfully"};
+    return {message: "Roles asignados correctamente"};
   } catch (error: any) {
-    logger.error(`Error assigning claims to user ${email}:`, error);
+    logger.error(
+      `Error al asignar el rol al usuario con el email ${email}:`,
+      error
+    );
     return new HttpsError(
-      "internal", `Failed to assign claims: (${error.message})`
+      "internal", `Error al asignar el rol: (${error.message})`
     );
   }
 }

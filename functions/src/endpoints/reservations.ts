@@ -8,15 +8,16 @@ import {DecodedIdToken, getAuth} from "firebase-admin/auth";
 import getWereByTenant from "../were/were-by-tenant";
 
 /**
- * Retrieves project data based on specified filters and pagination options.
+ * Retrieves reservation data based on specified filters and pagination options.
  *
  * @param {FirebaseFirestore.Firestore} db - The Firestore database instance.
  * @param {CallableRequest<any>} request - The request object containing data.
- * @return {Promise<any>} An object containing an array of projects data
+ * @return {Promise<any>} An object containing an array of reservations data
  * and the last document for pagination.
- * @throws {HttpsError} Throws an error if there's an issue retrieving projects.
+ * @throws {HttpsError} Throws an error if there's an issue
+ * retrieving reservations.
  */
-export default async function getProjectsData(
+export default async function getReservationData(
   db: FirebaseFirestore.Firestore,
   request: CallableRequest<any>
 ) {
@@ -36,11 +37,11 @@ export default async function getProjectsData(
   const validToken: DecodedIdToken = await auth.verifyIdToken(token);
 
   if (!validToken) {
-    return new HttpsError("internal", "Error getting projects");
+    return new HttpsError("internal", "Error al obtener la lista de reservas");
   }
 
   if (validToken.role === "unauthorized") {
-    return new HttpsError("internal", "Permissions denied");
+    return new HttpsError("internal", "Permiso denegado");
   }
 
   const whereClause: Filter[] = [];
@@ -62,7 +63,7 @@ export default async function getProjectsData(
   }
 
   try {
-    const collectionRef = db.collection("projects");
+    const collectionRef = db.collection("reservations");
     let query = collectionRef.orderBy("created", "desc");
 
     // Apply where clauses if any
@@ -90,20 +91,23 @@ export default async function getProjectsData(
     const querySnapshot = await query.get();
 
     if (querySnapshot.empty) {
-      return {projects: [], lastDoc: null, count: 0};
+      return {reservations: [], lastDoc: null, count: 0};
     }
 
     const nextLastDoc =
       querySnapshot.docs[querySnapshot.docs.length - 1].id;
 
-    const projectsData = querySnapshot.docs.map((doc) => ({
+    const reservationsData = querySnapshot.docs.map((doc) => ({
       id: doc.id,
       data: doc.data(),
     }));
 
-    return {projects: projectsData, lastDoc: nextLastDoc, count};
+    return {reservations: reservationsData, lastDoc: nextLastDoc, count};
   } catch (error) {
-    logger.error("Error trying to apply selected filters", error);
-    throw new HttpsError("internal", "Error getting projects");
+    logger.error(
+      "Error al tratar de establecer los filtros seleccionados",
+      error
+    );
+    throw new HttpsError("internal", "Error al obtener las reservas");
   }
 }
