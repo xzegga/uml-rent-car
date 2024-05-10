@@ -190,7 +190,7 @@ const Users: React.FC = () => {
                     </FormControl>
                     <FormControl id="password" flex={2} isInvalid={newUser?.password === ''}>
                         <Flex alignItems={'center'}>
-                            <FormLabel>Password</FormLabel>
+                            <FormLabel>Contraseña</FormLabel>
                             {!newUser?.password && <FormErrorMessage mt={0} mb={2}>(* Required)</FormErrorMessage>}
                         </Flex>
                         <InputGroup borderColor="#E0E1E7" display={'flex'} flexDirection={'column'}>
@@ -202,7 +202,7 @@ const Users: React.FC = () => {
                         </InputGroup>
                     </FormControl>
                     <FormControl id="tenant" flex={3} isRequired={newUser?.tenant === ''}>
-                        <FormLabel>Client</FormLabel>
+                        <FormLabel>Empresa</FormLabel>
                         <InputGroup borderColor="#E0E1E7" display={'flex'} flexDirection={'column'}>
                             <TenantDropdown
                                 value={newUser?.tenant || ''}
@@ -214,7 +214,7 @@ const Users: React.FC = () => {
                                 && <FormErrorMessage>Client is required.</FormErrorMessage>}
                         </InputGroup>
                     </FormControl>
-                    <FormControl id="department" flex={1}>
+                    {/* <FormControl id="department" flex={1}>
                         <FormLabel>Department</FormLabel>
                         <InputGroup borderColor="#E0E1E7">
 
@@ -242,7 +242,7 @@ const Users: React.FC = () => {
 
                             </Select>
                         </InputGroup>
-                    </FormControl>
+                    </FormControl> */}
                     <FormControl id="logo" flex={1}>
                         <InputGroup>
                             <Flex gap={2}>
@@ -279,12 +279,11 @@ const Users: React.FC = () => {
                     <Table>
                         <Thead>
                             <Tr>
-                                <Th>Name</Th>
+                                <Th>Nombre</Th>
                                 <Th>Email</Th>
                                 <Th>Roles</Th>
-                                <Th>Client</Th>
-                                <Th>Departments</Th>
-                                <Th>Actions</Th>
+                                <Th>Empresa</Th>
+                                <Th>Acciones</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
@@ -326,7 +325,7 @@ const Users: React.FC = () => {
                                             handleChange={(e: any) => handleRole(e, user)}
                                             select={'None'} />
                                     </Td>
-                                    <Td px={1.5} py={0.5}>
+                                    {/* <Td px={1.5} py={0.5}>
                                         <Select
                                             h={'30px'}
                                             maxW={'180px'}
@@ -353,13 +352,13 @@ const Users: React.FC = () => {
                                                 : null}
 
                                         </Select>
-                                    </Td>
+                                    </Td> */}
                                     <Td py={1.5} px={1.5}>
                                         <Button
                                             h={'30px'} disabled={user.data?.role === ROLES.Admin} variant="outline" onClick={() => {
                                                 setIsOpen(true);
                                                 setUser(user);
-                                            }}>Delete</Button>
+                                            }}>Eliminar</Button>
                                     </Td>
                                 </Tr>
                             ))}

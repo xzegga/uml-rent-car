@@ -1,11 +1,19 @@
-// Reservation table interface
+import { Timestamp } from 'firebase/firestore';
+
 export interface Reservation {
-    reservationID: number; // Primary Key
-    vehicleID: number; // Foreign Key
-    clientID: number; // Foreign Key
-    startDate: Date;
-    endDate: Date;
+    reservationId: number;
+    vehicleID: number;
+    clientID: number;
+    startDate: Timestamp;
+    endDate: Timestamp;
     mileageUsed: number;
-    deliveryTime: Date;
+    deliveryTime: Timestamp;
     status: string;
+    created: Timestamp;
+    tenant: string;
+}
+
+export interface ReservationObject {
+    id: string;
+    data: Reservation;
 }

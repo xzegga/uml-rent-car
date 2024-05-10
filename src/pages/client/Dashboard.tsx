@@ -10,11 +10,10 @@ import {
 } from '@chakra-ui/react';
 
 import NavLnk from '../../components/NavLnk';
-import ProjectListTable from '../../components/tables/ProjectListTable';
+import ReservationListTable from '../../components/tables/ReservationListTable';
 import TenantDropdown from '../../components/TenantDropdown';
-import { deleteProject } from '../../data/Projects';
+import { deleteReservation } from '../../data/Reservations';
 import { useStore } from '../../hooks/useGlobalStore';
-import useProjectExtras from '../../hooks/useProjectExtras';
 import { ProjectObject } from '../../models/project';
 import { ROLES } from '../../models/Users';
 import { exportToExcel } from '../../utils/export';
@@ -22,6 +21,7 @@ import { generateYears } from '../../utils/helpers';
 import { allStatuses, monthNames } from '../../utils/value-objects';
 import { useAuth } from '../../context/AuthContext';
 import ChangeStatusSelector from '../../components/ChangeStatus';
+import { ReservationObject } from '../../models/Reservation';
 
 const months = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -45,9 +45,8 @@ const Dashboard: React.FC = () => {
         refresh,
         setState } = useStore()
 
-    const [projects, setProjects] = useState<ProjectObject[]>([]);
-    const [project, setProject] = useState<ProjectObject>();
-    const { debounce } = useProjectExtras(project);
+    const [reservations, setReservations] = useState<ReservationObject[]>([]);
+    const [reservation, setReservation] = useState<ReservationObject>();
 
     const [lastDoc, setLastDoc] = useState<string>();
     const [request, setRequest] = useState<string>('');
@@ -58,33 +57,33 @@ const Dashboard: React.FC = () => {
     const onClose = () => setIsOpen(false);
 
     const fetchMore = () => {
-        getProjectQuery(false);
+        getReservationQuery(false);
     };
 
-    const removeProject = (project: ProjectObject) => {
-        setProject(project);
+    const removeReservation = (reservation: ReservationObject) => {
+        setReservation(reservation);
         setIsOpen(true);
     };
 
     const handleDeleteProject = async () => {
-        if (currentUser && project) {
+        if (currentUser && reservation) {
             await validate();
-            deleteProject(project.id);
+            deleteReservation(reservation.id);
 
             toast({
-                title: 'Project deleted',
-                description: 'The project has been deleted',
+                title: 'Reservacion borrada',
+                description: 'La reserva ha sido eliminada',
                 status: 'success',
                 duration: 9000,
                 isClosable: true
             });
 
             setIsOpen(false);
-            const projectsCopy = [...projects];
-            const index = projectsCopy.findIndex((p) => p.id === project.id);
+            const projectsCopy = [...reservations];
+            const index = projectsCopy.findIndex((p) => p.id === reservation.id);
             if (index > -1) {
                 projectsCopy.splice(index, 1);
-                setProjects(projectsCopy);
+                setReservations(projectsCopy);
             }
         }
     };
@@ -100,14 +99,14 @@ const Dashboard: React.FC = () => {
     };
 
     useEffect(() => {
-        getProjectQuery(true);
+        getReservationQuery(true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [monthSelected, yearSelected, status, requestdb, pagination, tenantQuery]);
 
     useEffect(() => {
         if (refresh === true) {
             setState({ refresh: false });
-            getProjectQuery(true);
+            getReservationQuery(true);
         }
     }, [refresh])
 
@@ -115,7 +114,7 @@ const Dashboard: React.FC = () => {
         setRequestdb(req);
     }
 
-    const getProjectQuery = async (
+    const getReservationQuery = async (
         newQuery: boolean = false
     ) => {
         try {
@@ -123,14 +122,14 @@ const Dashboard: React.FC = () => {
                 await validate();
                 setState({ loading: true, loadingMore: true });
                 const functions = getFunctions();
-                const getAllProjets = httpsCallable(functions, 'getProjects');
+                const getAllReservations = httpsCallable(functions, 'getReservations');
 
                 let tenant = null;
                 if (currentUser.role === ROLES.Admin) {
                     tenant = tenantQuery && tenantQuery !== '' ? tenantQuery : currentUser.tenant;
                 }
 
-                const projectData: any = await getAllProjets({
+                const reservationData: any = await getAllReservations({
                     status,
                     monthSelected,
                     yearSelected,
@@ -143,24 +142,23 @@ const Dashboard: React.FC = () => {
                 });
 
                 if (newQuery) {
-                    setProjects(projectData?.data?.projects || []);
+                    setReservations(reservationData?.data?.reservations || []);
                 } else {
-                    setProjects([
-                        ...projects,
-                        ...projectData?.data?.projects || []
+                    setReservations([
+                        ...reservations,
+                        ...reservationData?.data?.reservations || []
                     ]);
                 }
 
-                setLastDoc(projectData?.data.lastDoc || null);
-                setCount(projectData?.data?.count);
+                setLastDoc(reservationData?.data.lastDoc || null);
                 setState({ loading: false, loadingMore: false });
             }
 
         } catch (error) {
             // Handle error
             toast({
-                title: 'Error getting projects',
-                description: 'There is an error getting the project list',
+                title: 'Error',
+                description: 'Se produjo un error al obtener el listado de reservaciones',
                 status: 'error',
                 duration: 9000,
                 isClosable: true
@@ -171,14 +169,14 @@ const Dashboard: React.FC = () => {
 
     function exportToExcelFn(): void {
         const headers = [['Request No', 'Project', 'Source Language', 'Target Language', 'Word Count', 'Total']];
-        const dataArray = projects.map((item) => (
+        const dataArray = reservations.map((item) => (
             [
-                item.data.requestNumber,
-                item.data.projectId,
-                item.data.sourceLanguage,
-                item.data.targetLanguage,
-                item.data.wordCount || 0,
-                item.data.billed || 0
+                item.data.reservationId,
+                item.data.vehicleID,
+                item.data.clientID,
+                item.data.startDate,
+                item.data.endDate,
+                item.data.mileageUsed
             ]
         ));
         const data = [...headers, ...dataArray];
@@ -192,10 +190,8 @@ const Dashboard: React.FC = () => {
         setState({ tenantQuery: value })
     }
 
-    const debouncedHandleRequestChange = useMemo(() => debounce(setRequestDb, 300), []);
-
     const onChangeStatusSuccess = (st: string) => {
-        const newProjectStatuses = projects.map((item) => (
+        const newProjectStatuses = reservations.map((item) => (
             {
                 ...item,
                 data: {
@@ -204,7 +200,7 @@ const Dashboard: React.FC = () => {
                 }
             }
         ));
-        setProjects(newProjectStatuses);
+        setReservations(newProjectStatuses);
         setState({ selectedIds: [], status: st })
     }
 
@@ -381,15 +377,15 @@ const Dashboard: React.FC = () => {
                             </Box>
                             : null}
                         <Box>
-                            <ProjectListTable
-                                projects={projects}
-                                removeProject={removeProject} />
+                            <ReservationListTable
+                                reservations={reservations}
+                                removeReservation={removeReservation} />
                             <Spacer mt={10} />
                             <Center>
-                                Mostrando {projects.length} de {count ? count : 0} autos rentados
+                                Mostrando {reservations.length} de {count ? count : 0} autos rentados
                             </Center>
                             <Center>
-                                {count && count > projects.length && (
+                                {count && count > reservations.length && (
                                     <Link onClick={fetchMore} color={'blue.700'}>
                                         Cargar más...
                                     </Link>
@@ -402,7 +398,7 @@ const Dashboard: React.FC = () => {
                         <AlertDialogOverlay>
                             <AlertDialogContent>
                                 <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                                    Borrar {project?.data.projectId}
+                                    Borrar {reservation?.data.projectId}
                                 </AlertDialogHeader>
 
                                 <AlertDialogBody>Are you sure to delete this project? All related files will be deleted and you can't undo this action afterward.</AlertDialogBody>

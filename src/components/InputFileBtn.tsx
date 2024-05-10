@@ -1,7 +1,7 @@
 import { Button, Flex, Text } from '@chakra-ui/react';
 import React, { useRef } from 'react';
 import { GrDocumentZip } from 'react-icons/gr';
-import '../pages/shared/AddProject.css';
+import '../pages/shared/AddReservation.css';
 
 interface InputFileProps {
     uploadFile?: (files: FileList) => Promise<void>;

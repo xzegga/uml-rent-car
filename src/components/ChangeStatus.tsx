@@ -8,7 +8,7 @@ import {
     AlertStatus, Text
 } from '@chakra-ui/react';
 
-import { getProjectById, updateStatus } from '../data/Projects';
+import { getReservationById, updateStatus } from '../data/Reservations';
 import { ProjectObject } from '../models/project';
 import { db } from '../utils/init-firebase';
 import { statuses } from '../utils/value-objects';
@@ -40,7 +40,7 @@ export default function ChangeStatusSelector({ project, onSuccess, ids, setProje
     const changeStatus = async () => {
         if (project) {
             await validate();
-            const response = await getProjectById(project?.id);
+            const response = await getReservationById(project?.id);
 
             await setDoc(doc(db, 'projects', project.id), {
                 ...response.data,

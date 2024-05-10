@@ -7,16 +7,16 @@ import { db } from '../../utils/init-firebase';
 import { storage } from '../../utils/init-firebase';
 import { ref, getDownloadURL, getBlob } from 'firebase/storage';
 import fileDownload from 'js-file-download'
-import ProjectTable from '../../components/tables/ProjectDetailTable';
+import ReservationTable from '../../components/tables/ReservationDetailTable';
 import DocumentTable from '../../components/tables/DocumentTable';
 import { GrDocumentZip } from 'react-icons/gr';
 import { ProjectObject } from '../../models/project';
 import { Document, DocumentObject, ProcessedDocument } from '../../models/document';
 import { getDocuments, saveCertificate, saveTargetDocuments } from '../../data/Documents';
 import { useStateWithCallbackLazy } from 'use-state-with-callback';
-import './AddProject.css';
+import './AddReservation.css';
 import InputFileBtn from '../../components/InputFileBtn';
-import { getProjectById } from '../../data/Projects';
+import { getReservationById } from '../../data/Reservations';
 import Urgent from '../../assets/isUrgent.svg?react';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import JSZip from 'jszip';
@@ -27,7 +27,7 @@ import ChangeStatusSelector from '../../components/ChangeStatus';
 
 const jszip = new JSZip();
 
-const ProjectDetail: React.FC = () => {
+const ReservationDetail: React.FC = () => {
     const { projectId } = useParams();
     const { currentUser } = useStore();
     const toast = useToast()
@@ -41,7 +41,7 @@ const ProjectDetail: React.FC = () => {
 
     useEffect(() => {
         if (currentUser && projectId) {
-            getProjectById(projectId).then(response => {
+            getReservationById(projectId).then(response => {
                 setProject(response);
             });
 
@@ -214,7 +214,7 @@ const ProjectDetail: React.FC = () => {
                                 )}
                                 {project.data.status && currentUser?.role === ROLES.Client && <Status status={project.data.status} />}
                             </Flex>
-                            <ProjectTable project={project}></ProjectTable>
+                            <ReservationTable reservation={project}></ReservationTable>
 
                         </>
                         }
@@ -287,5 +287,5 @@ const ProjectDetail: React.FC = () => {
     );
 };
 
-export default ProjectDetail;
+export default ReservationDetail;
 

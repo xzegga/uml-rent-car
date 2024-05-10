@@ -1,5 +1,5 @@
 export interface Vehicle {
-    vehicleID: number; // Primary Key
+    vehicleID: number; 
     brand: string;
     model: string;
     year: number;

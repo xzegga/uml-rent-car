@@ -1,4 +1,4 @@
-import './AddProject.css';
+import './AddReservation.css';
 
 import { addDays } from 'date-fns';
 import { Timestamp } from 'firebase/firestore';
@@ -16,7 +16,7 @@ import Urgent from '../../assets/isUrgent.svg?react';
 import DatePicker from '../../components/DatePicker';
 import DropZone from '../../components/DropZone';
 import Languages from '../../components/Languages';
-import { saveProject } from '../../data/Projects';
+import { saveReservation } from '../../data/Reservations';
 import { getAllTenants } from '../../data/Tenant';
 import { useStore } from '../../hooks/useGlobalStore';
 import { Tenant } from '../../models/Clients';
@@ -42,7 +42,7 @@ const initialState: Project = {
   department: ''
 };
 
-const AddProject: React.FC = () => {
+const AddReservation: React.FC = () => {
   const [files, setFiles] = useState<Doc[]>([]);
   const [saving, setSaving] = useStateWithCallbackLazy<boolean>(false);
   const { currentUser, tenant } = useStore();
@@ -96,7 +96,7 @@ const AddProject: React.FC = () => {
         ...tenantoptions,
       };
 
-      await saveProject(projectToSave, files, tenant);
+      await saveReservation(projectToSave, files, tenant);
       setSaving(false, () => navigate(`/${currentUser?.role}`));
     }
   };
@@ -370,4 +370,4 @@ const AddProject: React.FC = () => {
   );
 };
 
-export default AddProject;
+export default AddReservation;
