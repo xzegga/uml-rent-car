@@ -1,367 +1,248 @@
 import './AddReservation.css';
-
-import { addDays } from 'date-fns';
 import { Timestamp } from 'firebase/firestore';
-import React, { ChangeEvent, useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { NavLink, useNavigate, useParams } from 'react-router-dom';
 import { useStateWithCallbackLazy } from 'use-state-with-callback';
 
 import {
-  Box, Breadcrumb, BreadcrumbItem, Button, Checkbox, CircularProgress, Container, Flex,
-  FormControl, FormLabel, Heading, Input, InputGroup, Select, Spacer, Stack, Text, Textarea,
-  VStack, Wrap, WrapItem
+  Box, Breadcrumb, BreadcrumbItem, Button, Image, Container, Flex,
+  FormControl, FormLabel, Heading, InputGroup, Select, Spacer, Text,
+  VStack,
+  AlertIcon,
+  Alert,
+  AlertTitle,
+  AlertDescription,
+  Link,
 } from '@chakra-ui/react';
 
-import Urgent from '../../assets/isUrgent.svg?react';
-import DatePicker from '../../components/DatePicker';
-import DropZone from '../../components/DropZone';
-import Languages from '../../components/Languages';
-import { saveReservation } from '../../data/Reservations';
-import { getAllTenants } from '../../data/Tenant';
-import { useStore } from '../../hooks/useGlobalStore';
-import { Tenant } from '../../models/Clients';
-import { Doc } from '../../models/document';
-import { Project } from '../../models/project';
-import { ROLES } from '../../models/Users';
-import { useAuth } from '../../context/AuthContext';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
 
-const initialState: Project = {
-  projectId: '',
-  isEditing: false,
-  isTranslation: true,
-  isCertificate: false,
-  sourceLanguage: 'English',
-  targetLanguage: 'Spanish',
-  timeLine: Timestamp.fromDate(addDays(new Date(), 5)),
-  additionalInfo: '',
-  status: 'Received',
-  requestNumber: '',
-  documents: [],
-  isUrgent: false,
-  tenant: '',
-  department: ''
+import { saveReservation } from '../../data/Reservations';
+import { useStore } from '../../hooks/useGlobalStore';
+import { useAuth } from '../../context/AuthContext';
+import { Reservation } from '../../models/Reservation';
+import useHandleFormControls from '../../hooks/handleFormControls';
+import Navigation from '../../components/Navigation';
+import { getDocuments } from '../../data/Documents';
+import { updateAvailability } from '../../data/Vehicles';
+
+const initialState: Reservation = {
+  vehicleId: '',
+  userId: '',
+  startDate: Timestamp.now(),
+  endDate: Timestamp.now(),
+  mileageUsed: 0,
+  status: 'Recibido',
+  pickupPlace: '',
+  created: Timestamp.now(),
 };
 
 const AddReservation: React.FC = () => {
-  const [files, setFiles] = useState<Doc[]>([]);
+  const { id } = useParams();
   const [saving, setSaving] = useStateWithCallbackLazy<boolean>(false);
-  const { currentUser, tenant } = useStore();
+  const { currentUser, vehicles } = useStore();
+  const [vehicle] = useState(vehicles.find((v) => v.id === id));
   const { validate } = useAuth();
-  const [project, setProject] = useState<Project>({
+  const [metaData, setMetadata] = React.useState<any>();
+  const [item, setItem] = useState<Reservation>({
     ...initialState,
-    tenant: tenant.slug,
-    department: currentUser.department
+    userId: currentUser?.uid,
+    vehicleId: id ? id : '',
   });
 
-  const [tenants, setTenants] = useState<Tenant[]>([]);
+  const {
+    handleDropDown,
+    handleDate,
+  } = useHandleFormControls(item, setItem);
+
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchData = async () => {
-
-      const fetchedTenants = await getAllTenants(currentUser.token);
-      setTenants(fetchedTenants);
-    };
-
-    if (currentUser?.role === ROLES.Admin) {
-      fetchData();
-    }
-
-  }, []);
-
   const saveRequest = async () => {
-    if (!files) return;
-
     if (currentUser) {
       await validate();
       setSaving(true, () => console.log);
-      const langs = files.map((f) => [...f.target]);
-      let multilingual = false;
 
-      langs.forEach((f) => {
-        if (f.length > 1 || f.join('') !== project.targetLanguage) multilingual = true;
-      });
-
-      let tenantoptions = {}
-      if (currentUser.role !== ROLES.Admin) {
-        tenantoptions = {
-          tenant: currentUser?.tenant,
-          department: project.department ?? currentUser.department,
-        }
-      }
-
-      const projectToSave: Project = {
-        ...project,
-        targetLanguage: multilingual ? 'Multilingual' : project.targetLanguage,
-        ...tenantoptions,
+      const serervationToSave: Reservation = {
+        ...item,
       };
 
-      await saveReservation(projectToSave, files, tenant);
-      setSaving(false, () => navigate(`/${currentUser?.role}`));
+      await saveReservation(serervationToSave);
+      await updateAvailability(id ? [id] : [], false);
+      setSaving(false, () => navigate(`/${currentUser?.role}/rentals`));
+
     }
   };
 
-  const handleLanguage = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setProject({ ...project, [e.target.name]: e.target.value });
+  useEffect(() => {
+    if (!id) return;
+    getVehicleData();
+  }, [id]);
+
+  const getVehicleData = async () => {
+    if (!id || metaData?.id === id) return;
+
+    const result = await getDocuments(id);
+    const mdt = {
+      id,
+      image: result?.length ? result[0] : '',
+    }
+    setMetadata(mdt);
   };
 
-  const handleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProject({ ...project, [e.target.name]: e.target.checked });
-  };
-
-  const handleDate = (date: Date) => {
-    setProject({ ...project, timeLine: Timestamp.fromDate(date) });
-  };
-
-  const handleTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setProject({ ...project, additionalInfo: e.target.value });
-  };
-
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProject({ ...project, [e.target.name]: e.target.value });
-  };
-
-  const handleDateCreated = (date: Date) => {
-    setProject({ ...project, created: Timestamp.fromDate(new Date(date)) });
-  };
-
-  const handleRole = async (e: ChangeEvent<HTMLSelectElement>) => {
-    const name = e.target.name;
-    const value = e.target.value;
-
-    setProject({
-      ...project,
-      ...(value && { [`${name}`]: value }),
-    });
-  }
 
   return (
     <>
       {currentUser && (
-        <Container maxW="full" mt={0} w={'container.lg'} overflow="hidden" width={'100%'}>
-          <Flex mb="10">
+        <Container maxW="full" mt={0} w={'container.lg'} overflow="hidden" width={'100%'} py={4}>
+          <Flex mb="1" alignItems={'start'}>
             <Box>
+              <Heading size="md" whiteSpace={'nowrap'} pl={0}>
+                <Flex alignItems={'center'} gap={3}>
+                  <Text>Reservación</Text>
+                </Flex>
+              </Heading>
               <Breadcrumb separator="/">
                 <BreadcrumbItem>
-                  <Text>Home</Text>
+                  <NavLink to={`/`}>Inicio</NavLink>
                 </BreadcrumbItem>
                 <BreadcrumbItem>
-                  <NavLink to={`/${currentUser.role}`}>Project Dashboard</NavLink>
+                  <NavLink to={`/${currentUser.role}/rentals`}>Reservaciones</NavLink>
+                </BreadcrumbItem>
+                <BreadcrumbItem>
+                  <Text>Reservar {vehicle?.data.model}</Text>
                 </BreadcrumbItem>
               </Breadcrumb>
             </Box>
-
             <Spacer />
+            <Navigation />
           </Flex>
-          <Heading size="md">Add Project Request</Heading>
-          <Box position={'relative'} width={'100%'}>
-            <Flex border="1px" borderColor="gray.200" borderRadius="lg" mt="10" className={saving ? 'blured' : ''} position={'relative'}>
-              <Box borderRadius="lg" bg="blue.700" color="white" flex={1}>
-                <Box p={4}>
-                  <Wrap>
-                    <WrapItem>
-                      <Box borderRadius="lg">
-                        <Box m={4} color="white">
-                          <VStack spacing={5}>
-                            {currentUser.role === ROLES.Admin ? <>
-                              <FormControl id="tenant">
-                                <FormLabel>Client</FormLabel>
-                                <InputGroup borderColor="#E0E1E7">
-                                  <Select
-                                    required
-                                    name="tenant"
-                                    value={project.tenant}
-                                    onChange={handleRole}
-                                    color="black"
-                                    backgroundColor={'white'}
-                                    size="md"
-                                    flex={1}
-                                  >
-                                    {tenants && tenants.length ? <>
-                                      {tenants.map((tn) => <option
-                                        key={tn.id}
-                                        value={tn.slug}
-                                      >{tn.name}</option>)}
-                                    </>
-                                      : null}
 
-                                  </Select>
-                                </InputGroup>
-                              </FormControl>
-                            </> : null}
+          <Box width={'100%'} pt={10}>
+            <Flex borderRadius="lg" mt="10" className={saving ? 'blured' : ''} alignItems={'center'} >
+              <Flex flex={1.2} flexDirection={'column'} justifyContent={'center'} minH={'100%'} cursor={'pointer'}>
+                {metaData?.image !== '' ? (
+                  <Image
+                    borderRadius="lg"
+                    width="100%"
+                    src={metaData?.image}
+                    loading='lazy'
+                  />
+                ) : null}
+              </Flex>
+              <Box flex={2} borderRadius="lg" bg="blue.700" color="white" p={5} ml={'-10px'}>
+                <Flex pl={2}>
 
-                            <FormControl id="department">
-                              <FormLabel>Department</FormLabel>
-                              <InputGroup borderColor="#E0E1E7">
-                                <Select
-                                  required
-                                  name="department"
-                                  value={project.department}
-                                  onChange={handleRole}
-                                  color="black"
-                                  backgroundColor={'white'}
-                                  size="md"
-                                  flex={1}
-                                >
-                                  
-                                  {
-                                    currentUser.role === ROLES.Admin ?
-                                      <>
-                                        <option value='all'>All</option>
-                                        {
-                                          tenants && tenants.length ? <>
-                                            {
-                                              tenants.find(tn => tn.slug === project?.tenant)?.departments.map((dp) =>
-                                                <option
-                                                  key={dp}
-                                                  value={dp}
-                                                >{dp}
-                                                </option>
-                                              )
-                                            }
-                                          </>
-                                            : null
-                                        }
-                                      </> : <>
-                                        {
-                                          currentUser.department === 'all' ? <>
-                                            {
-                                              tenant && tenant.departments.length ? <>
-                                                {tenant.departments.map((dp) =>
-                                                  <option
-                                                    key={dp}
-                                                    value={dp}
-                                                  >{dp}
-                                                  </option>)
-                                                }
-                                              </> : null
-                                            }
-                                          </> : <option value={currentUser.department}>
-                                            {currentUser.department}
-                                          </option>
-                                        }
-                                      </>
-                                  }
-                                </Select>
-                              </InputGroup>
-                            </FormControl>
+                  <VStack justifyContent={'start'} textAlign={'left'} alignItems={'flex-start'} w={'100%'}>
+                    <Heading>{vehicle?.data.brand} {vehicle?.data.model} {vehicle?.data.year}</Heading>
+                    <Spacer />
+                    <Text>Tipo: {vehicle?.data.type}</Text>
+                    <Text>Placa: {vehicle?.data.plate}</Text>
+                    {vehicle?.data?.milleage ?
+                      <Text>Recorrido: {parseFloat(vehicle?.data?.milleage.toString()).toLocaleString('en-US')} Kms</Text>
+                      : null}
+                  </VStack>
 
-                            <FormControl id="language_requested">
-                              <FormLabel>Request Number</FormLabel>
-                              <InputGroup borderColor="#E0E1E7">
-                                <Input placeholder="Request Number" name="requestNumber" id="requestNumber" value={project.requestNumber} onChange={handleInput} />
-                              </InputGroup>
-                            </FormControl>
-
-                            {currentUser.role === ROLES.Admin && (
-                              <FormControl id="language_requested">
-                                <FormLabel>Created Date (Only Admin)</FormLabel>
-                                <InputGroup borderColor="#E0E1E7">
-                                  <Box color={'black'}>
-                                    <DatePicker handleDate={handleDateCreated}></DatePicker>
-                                  </Box>
-                                </InputGroup>
-                              </FormControl>
-                            )}
-                            <FormControl id="language_requested">
-                              <FormLabel>Source Language</FormLabel>
-                              <InputGroup borderColor="#E0E1E7">
-                                <Languages handleChange={handleLanguage} name={'sourceLanguage'} selected={project.sourceLanguage}></Languages>
-                              </InputGroup>
-                            </FormControl>
-                            <FormControl id="language_requested">
-                              <FormLabel>Language Requested</FormLabel>
-                              <InputGroup borderColor="#E0E1E7">
-                                <Languages handleChange={handleLanguage} name={'targetLanguage'} selected={project.targetLanguage}></Languages>
-                              </InputGroup>
-                            </FormControl>
-                            <FormControl id="services">
-                              <Stack spacing={5} direction="row" wrap={'wrap'}>
-                                <Checkbox required name="isTranslation" id="isTranslation"
-                                  checked={project.isTranslation} onChange={handleCheckbox}>
-                                  Translation
-                                </Checkbox>
-                                <Checkbox name="isEditing" id="isEditing" checked={project.isEditing} onChange={handleCheckbox}>
-                                  Editing
-                                </Checkbox>
-                                <Checkbox name="isCertificate" id="isCertificate" checked={project.isCertificate} onChange={handleCheckbox}>
-                                  Requires certification
-                                </Checkbox>
-                              </Stack>
-
-                            </FormControl>
-                            <div className='border-top'></div>
-                            <FormControl id="urgent">
-                              <Flex alignItems={'center'}>
-                                <Checkbox name="isUrgent" id="isUrgent" checked={project.isUrgent} onChange={handleCheckbox}>
-                                  <Flex alignItems={'center'}>Mark as Urgent <Urgent className="isUrgent" /></Flex>
-                                </Checkbox>
-                              </Flex>
-                            </FormControl>
-
-                            <FormControl id="language_requested">
-                              <FormLabel>Project Timeline</FormLabel>
-                              <InputGroup borderColor="#E0E1E7">
-                                <Box color={'black'}>
-                                  <DatePicker handleDate={handleDate} restrictDate={true}></DatePicker>
-                                </Box>
-                              </InputGroup>
-                            </FormControl>
-                            <FormControl id="additional_information">
-                              <FormLabel>Additional Information</FormLabel>
-                              <Textarea
-                                name="additionalInfo"
-                                id="additionalInfo"
-                                value={project.additionalInfo}
-                                onChange={handleTextArea}
-                                borderColor="gray.300"
-                                _hover={{
-                                  borderRadius: 'gray.300'
-                                }}
-                                placeholder="message"
-                              />
-                            </FormControl>
-                            <FormControl id="name" float="right">
-                              {files.length > 0 ? (
-                                <Button variant="outline" color="white" onClick={saveRequest}>
-                                  Submit Project
-                                </Button>
-                              ) : (
-                                <Text color={'yellow.300'}>
-                                  Add files on the right box <br /> to save the new project
-                                </Text>
-                              )}
-                            </FormControl>
+                </Flex>
+                <Spacer />
+                {vehicle?.data?.available === false ?
+                  <Box my={5}>
+                    <Alert status='warning' borderRadius={'md'} color={'orange.900'} textAlign={'left'} alignItems={'start'}>
+                      <AlertIcon />
+                      <Box>
+                        <AlertTitle>Vehículo no disponible!</AlertTitle>
+                        <AlertDescription>
+                          <VStack pt={2}>
+                            <Text>Este vehículo no está disponible por el momento, por favor seleccione otro vehículo.</Text>
+                            <Link ml={'auto'} onClick={() => navigate(`/`, { replace: true })} colorScheme={'blue.700'} mr={5}>
+                              Volver
+                            </Link>
                           </VStack>
-                        </Box>
+                        </AlertDescription>
                       </Box>
-                    </WrapItem>
-                  </Wrap>
-                </Box>
+                    </Alert>
+                  </Box> :
+                  <Box>
+                    <VStack spacing={5} mr={3} flexGrow={1} flexShrink={1} flexBasis={'50%'} p={2} pt={5}>
+                      <Flex w={'100%'} justifyContent={'start'} gap={5}>
+                        <FormControl id="language_requested" maxW={'210px'}>
+                          <FormLabel>Recogida</FormLabel>
+                          <InputGroup borderColor="#E0E1E7">
+                            <Box color={'black'}>
+                              <DatePicker
+                                selected={item?.startDate?.toDate()}
+                                onChange={(date) => {
+                                  handleDate(date || new Date(), 'startDate')
+                                }}
+                                locale="pt-BR"
+                                showTimeSelect
+                                timeFormat="p"
+                                timeIntervals={30}
+                                dateFormat="Pp"
+                                calendarClassName={'calendar-times'}
+                                minDate={new Date()}
+                              />
+                            </Box>
+                          </InputGroup>
+                        </FormControl>
+
+                        <FormControl id="endDate" maxW={'210px'}>
+                          <FormLabel>Devolución</FormLabel>
+                          <InputGroup borderColor="#E0E1E7">
+                            <Box color={'black'}>
+                              <DatePicker
+                                selected={item?.endDate?.toDate()}
+                                onChange={(date) => handleDate(date || new Date(), 'endDate')}
+                                locale="pt-BR"
+                                showTimeSelect
+                                timeFormat="p"
+                                timeIntervals={30}
+                                dateFormat="Pp"
+                                calendarClassName={'calendar-times'}
+                                minDate={item?.startDate?.toDate()}
+                              />
+                            </Box>
+                          </InputGroup>
+                        </FormControl>
+                      </Flex>
+                    </VStack>
+
+                    <Flex pl={2} pr={3} pb={5} mt={3} justifyContent={'space-between'} alignItems={'end'}>
+                      <FormControl id="department" maxW={'210px'}>
+                        <FormLabel>Tipo de Vehículo</FormLabel>
+                        <InputGroup borderColor="#E0E1E7">
+                          <Select
+                            required
+                            name="pickupPlace"
+                            value={item?.pickupPlace}
+                            onChange={handleDropDown}
+                            color="black"
+                            backgroundColor={'white'}
+                            size="md"
+                            flex={1}
+                          >
+                            <option value=''>Seleccione un lugar de recogida</option>
+                            <option value='Aeropuerto San Salvador'>Aeropuerto San Salvador</option>
+                            <option value='Agencia Nuevo Cuscatlan'>Agencia Nuevo Cuscatlan</option>
+                            <option value='Agencia Merliot'>Agencia Merliot</option>
+                          </Select>
+                        </InputGroup>
+                      </FormControl>
+
+                      <FormControl textAlign={'right'}>
+                        <Button
+                          colorScheme={'green'}
+                          onClick={saveRequest}
+                          disabled={!vehicle?.data?.available}
+                        >
+                          Reservar
+                        </Button>
+                      </FormControl>
+                    </Flex>
+                  </Box>}
+
               </Box>
 
-              <Flex flexDirection={'column'} justifyContent={'center'} minH={'100%'} cursor={'pointer'} flex={2} m="5">
-                <DropZone setFileList={setFiles} targetLanguage={project.targetLanguage} />
-              </Flex>
-            </Flex>
-            <Flex
-              style={{
-                position: 'absolute',
-                width: '100%',
-                height: '100%',
-                top: 0,
-                left: 0,
-                bottom: 0,
-                right: 0,
-                pointerEvents: 'none'
-              }}
-              justifyContent={'center'}
-            >
-              {saving && (
-                <Flex alignItems={'center'} justifyContent={'center'} direction={'column'}>
-                  <CircularProgress isIndeterminate mb={2} /> Saving Project Details...
-                </Flex>
-              )}
             </Flex>
           </Box>
         </Container>

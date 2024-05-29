@@ -17,7 +17,7 @@ export async function saveUserData(
   request: CallableRequest<any>
 ): Promise<any> {
   const {token, user} = request.data as any;
-  const {email, role, password, tenant, department} = user;
+  const {email, role, password} = user;
 
   await validateToken(token);
 
@@ -32,16 +32,12 @@ export async function saveUserData(
     await getAuth().setCustomUserClaims(userRecord.uid, {
       ...userRecord.customClaims,
       role,
-      tenant,
-      department,
     });
 
     await saveUserToDb(db, {
       uid: userRecord.uid,
       email,
       role,
-      tenant,
-      department,
     });
 
     return {
@@ -49,8 +45,6 @@ export async function saveUserData(
       data: {
         email,
         role,
-        tenant,
-        department,
         uid: userRecord.uid,
       },
     };
@@ -75,8 +69,6 @@ async function saveUserToDb(
         uid: string;
         email: any;
         role: any;
-        tenant: any;
-        department: any;
     }
 ): Promise<any> {
   try {
@@ -84,10 +76,9 @@ async function saveUserToDb(
     logger.info("User data saved successfully:", user);
   } catch (error) {
     logger.error("Error saving user data:", error);
-    return new HttpsError("internal", "Error saving user data");
+    return new HttpsError("internal", "Error saving user data", error);
   }
 }
-
 
 /**
  * Remove user to firebase auth
@@ -112,6 +103,10 @@ export async function removeUserData(
     return response;
   } catch (error: any) {
     logger.error("Error removing selected user:", error);
-    return new HttpsError("internal", "User deletion fails, please try again");
+    return new HttpsError(
+      "internal",
+      "User deletion fails, please try again",
+      error
+    );
   }
 }

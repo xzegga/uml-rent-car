@@ -9,16 +9,16 @@ import {
 } from '@chakra-ui/react';
 
 import { getReservationById, updateStatus } from '../data/Reservations';
-import { ProjectObject } from '../models/project';
 import { db } from '../utils/init-firebase';
 import { statuses } from '../utils/value-objects';
 import { useAuth } from '../context/AuthContext';
 import { FaArchive } from 'react-icons/fa';
+import { ReservationObject } from '../models/Reservation';
 
-export default function ChangeStatusSelector({ project, onSuccess, ids, setProject, button = false }: {
-    project?: ProjectObject,
+export default function ChangeStatusSelector({ reservation, onSuccess, ids, setReservation, button = false }: {
+    reservation?: ReservationObject,
     ids?: string[],
-    setProject?: Dispatch<React.SetStateAction<ProjectObject | undefined>>,
+    setReservation?: Dispatch<React.SetStateAction<ReservationObject | undefined>>,
     onSuccess?: (status: string) => void,
     button?: boolean;
 }) {
@@ -26,7 +26,7 @@ export default function ChangeStatusSelector({ project, onSuccess, ids, setProje
     const { validate } = useAuth();
     const onClose = () => setIsOpen(false)
     const cancelRef = useRef(null)
-    const [status, setStatus] = useState<string>(ids?.length ? statuses[0] : project?.data?.status || '')
+    const [status, setStatus] = useState<string>(ids?.length ? statuses[0] : reservation?.data?.status || '')
     const toast = useToast()
 
     const handleChangeStatus = (status: string) => {
@@ -38,20 +38,20 @@ export default function ChangeStatusSelector({ project, onSuccess, ids, setProje
     }
 
     const changeStatus = async () => {
-        if (project) {
+        if (reservation) {
             await validate();
-            const response = await getReservationById(project?.id);
+            const response = await getReservationById(reservation?.id);
 
-            await setDoc(doc(db, 'projects', project.id), {
+            await setDoc(doc(db, 'reservations', reservation.id), {
                 ...response.data,
                 status: status
             })
 
             // update project status
-            if (setProject) setProject({ ...project, data: { ...project.data, status: status } })
+            if (setReservation) setReservation({ ...reservation, data: { ...reservation.data, status: status } })
 
             toast({
-                description: `Status for ${project.data.projectId} has been changed to ${status}`,
+                description: `Status for ${reservation.id} has been changed to ${status}`,
                 status: 'info',
                 duration: 9000,
                 isClosable: true,
@@ -96,20 +96,20 @@ export default function ChangeStatusSelector({ project, onSuccess, ids, setProje
             <AlertDialogOverlay>
                 <AlertDialogContent>
                     <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                        {project ? <Text>Change Project Status</Text> :
-                            <Text>You are about to change the state of selected projects.</Text>}
+                        {reservation ? <Text>Cambiar estado de la reserva</Text> :
+                            <Text>Estas a punto de cambiar el estado de la reserva seleccionada</Text>}
                     </AlertDialogHeader>
 
                     <AlertDialogBody>
-                        Are you sure? You can't undo this action afterwards.
+                        Estas seguro de continuar? no se puede deshacer esta acción.
                     </AlertDialogBody>
 
                     <AlertDialogFooter>
                         <Button ref={cancelRef} onClick={onClose}>
-                            Cancel
+                            Cancelar
                         </Button>
                         <Button colorScheme={'blue'} onClick={changeStatus} ml={3}>
-                            Change to {status}
+                            Cambiar a {status}
                         </Button>
                     </AlertDialogFooter>
                 </AlertDialogContent>

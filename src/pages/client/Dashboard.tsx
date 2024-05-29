@@ -1,27 +1,24 @@
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import React, { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { AiOutlineFileExcel } from 'react-icons/ai';
-import { useNavigate } from 'react-router-dom';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import {
     AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader,
-    AlertDialogOverlay, Box, Button, Center, Container, Flex, FormControl, FormLabel, Heading,
-    Link, Select, Spacer, Tag, TagLabel, Text, useToast
+    AlertDialogOverlay, Box, Button, Center, Container, Flex, FormControl, FormLabel, Heading, Link,
+    Select, Spacer, Tag, TagLabel, Text, useToast
 } from '@chakra-ui/react';
 
+import ChangeStatusSelector from '../../components/ChangeStatus';
 import NavLnk from '../../components/NavLnk';
-import ReservationListTable from '../../components/tables/ReservationListTable';
-import TenantDropdown from '../../components/TenantDropdown';
+import ReservationListTable from '../../components/Reservations/ListTable';
+import { useAuth } from '../../context/AuthContext';
 import { deleteReservation } from '../../data/Reservations';
 import { useStore } from '../../hooks/useGlobalStore';
-import { ProjectObject } from '../../models/project';
+import { ReservationObject } from '../../models/Reservation';
 import { ROLES } from '../../models/Users';
-import { exportToExcel } from '../../utils/export';
 import { generateYears } from '../../utils/helpers';
 import { allStatuses, monthNames } from '../../utils/value-objects';
-import { useAuth } from '../../context/AuthContext';
-import ChangeStatusSelector from '../../components/ChangeStatus';
-import { ReservationObject } from '../../models/Reservation';
+import Navigation from '../../components/Navigation';
+import { updateAvailability } from '../../data/Vehicles';
 
 const months = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -29,18 +26,15 @@ const months = [
 ]
 
 const Dashboard: React.FC = () => {
-    const navigate = useNavigate();
     const toast = useToast();
     const cancelRef = useRef(null);
     const { validate } = useAuth();
     const {
-        tenant,
         currentUser,
         pagination,
         status,
         monthSelected,
         yearSelected,
-        tenantQuery,
         selectedIds,
         refresh,
         setState } = useStore()
@@ -49,15 +43,13 @@ const Dashboard: React.FC = () => {
     const [reservation, setReservation] = useState<ReservationObject>();
 
     const [lastDoc, setLastDoc] = useState<string>();
-    const [request, setRequest] = useState<string>('');
-    const [requestdb, setRequestdb] = useState<string>('');
-    const [count, setCount] = useState<number>()
+    const [count] = useState<number>()
     const [isOpen, setIsOpen] = useState(false);
 
     const onClose = () => setIsOpen(false);
 
     const fetchMore = () => {
-        getReservationQuery(false);
+        getQuery(false);
     };
 
     const removeReservation = (reservation: ReservationObject) => {
@@ -68,8 +60,9 @@ const Dashboard: React.FC = () => {
     const handleDeleteProject = async () => {
         if (currentUser && reservation) {
             await validate();
-            deleteReservation(reservation.id);
-
+            await deleteReservation(reservation.id);
+            await updateAvailability([reservation.data.vehicleId], true);
+            
             toast({
                 title: 'Reservacion borrada',
                 description: 'La reserva ha sido eliminada',
@@ -99,22 +92,18 @@ const Dashboard: React.FC = () => {
     };
 
     useEffect(() => {
-        getReservationQuery(true);
+        getQuery(true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [monthSelected, yearSelected, status, requestdb, pagination, tenantQuery]);
+    }, [monthSelected, yearSelected, status, pagination]);
 
     useEffect(() => {
         if (refresh === true) {
             setState({ refresh: false });
-            getReservationQuery(true);
+            getQuery(true);
         }
-    }, [refresh])
+    }, [refresh]);
 
-    const setRequestDb = (req: string) => {
-        setRequestdb(req);
-    }
-
-    const getReservationQuery = async (
+    const getQuery = async (
         newQuery: boolean = false
     ) => {
         try {
@@ -124,21 +113,15 @@ const Dashboard: React.FC = () => {
                 const functions = getFunctions();
                 const getAllReservations = httpsCallable(functions, 'getReservations');
 
-                let tenant = null;
-                if (currentUser.role === ROLES.Admin) {
-                    tenant = tenantQuery && tenantQuery !== '' ? tenantQuery : currentUser.tenant;
-                }
-
                 const reservationData: any = await getAllReservations({
                     status,
                     monthSelected,
                     yearSelected,
-                    requestdb,
                     lastDoc,
                     newQuery,
                     pagination,
                     token: currentUser.token,
-                    tenant,
+                    userId: currentUser.role === ROLES.Client ? currentUser.uid : null,
                 });
 
                 if (newQuery) {
@@ -167,29 +150,6 @@ const Dashboard: React.FC = () => {
         }
     };
 
-    function exportToExcelFn(): void {
-        const headers = [['Request No', 'Project', 'Source Language', 'Target Language', 'Word Count', 'Total']];
-        const dataArray = reservations.map((item) => (
-            [
-                item.data.reservationId,
-                item.data.vehicleID,
-                item.data.clientID,
-                item.data.startDate,
-                item.data.endDate,
-                item.data.mileageUsed
-            ]
-        ));
-        const data = [...headers, ...dataArray];
-
-        const fileName = `tpm-${months[monthSelected]}-${yearSelected}.xlsx`;
-        exportToExcel(data, fileName)
-    }
-
-    const handleRole = async (e: ChangeEvent<HTMLSelectElement>) => {
-        const value = e.target.value;
-        setState({ tenantQuery: value })
-    }
-
     const onChangeStatusSuccess = (st: string) => {
         const newProjectStatuses = reservations.map((item) => (
             {
@@ -209,52 +169,30 @@ const Dashboard: React.FC = () => {
             {currentUser && (
                 <>
                     <Container maxW="container.lg" w={'container.lg'} overflowX="auto" py={4}>
-                        <Flex mb="1" alignItems={'center'}>
-                            <Heading size="md" whiteSpace={'nowrap'} pl={3}>
+                        <Flex mb="1" alignItems={'start'}>
+                            <Heading size="md" whiteSpace={'nowrap'} pl={0}>
                                 <Flex alignItems={'center'} gap={3}>
                                     <Text>Autos Rentados</Text>
-                                    {currentUser.role === 'admin' || tenant.export &&
-                                        <TenantDropdown
-                                            value={tenantQuery || currentUser.tenant}
-                                            select={'all'}
-                                            handleChange={handleRole} />
-                                    }
                                 </Flex>
                             </Heading>
+                            
                             <Spacer />
-                            {currentUser.role === ROLES.Admin && (
-                                <Flex>
-
-                                    <Link onClick={() => navigate('users', { replace: true })} colorScheme={'blue.700'} mr={5}>
-                                        Usuarios
-                                    </Link>
-                                    <Link onClick={() => navigate('clients', { replace: true })} colorScheme={'blue.700'} mr={5}>
-                                        Clientes
-                                    </Link>
-                                </Flex>
-                            )}
-                            <Box>
-                                <NavLnk to="projects/add" name="Nueva Reserva" colorScheme="blue.500" bg="blue.700" size="md" color="white">
-                                    Rentar Nuevo
-                                </NavLnk>
-                            </Box>
+                            <Navigation />
                         </Flex>
-
                         <Box pt={10}>
                             <Box>
                                 <Flex justifyContent={'flex-end'}>
-                                    {/* <FormControl id="requestNumber" ml={2}>
-                                        <Flex alignItems={'center'} justifyContent={'start'}>
-                                            <FormLabel my={0}>Request</FormLabel>
-                                            <Input w={75}
-                                                value={request}
-                                                type='text'
-                                                onChange={(e) => {
-                                                    debouncedHandleRequestChange(e.target.value);
-                                                    setRequest(e.target.value)
-                                                }}></Input>
-                                        </Flex>
-                                    </FormControl> */}
+                                    <Box>
+                                        <NavLnk to="/client/reservation/add" name="Vehículo Nuevo" colorScheme="blue.500" bg="blue.700" size="md" color="white">
+                                            Vehículo Nuevo
+                                        </NavLnk>
+                                    </Box>
+                                </Flex>
+                            </Box>
+                        </Box>
+                        <Box pt={10}>
+                            <Box>
+                                <Flex justifyContent={'flex-end'}>
                                     <FormControl id="year_selection" ml={3} maxW={140}>
                                         <Flex alignItems={'center'} justifyContent={'start'}>
                                             <FormLabel my={0}>Año</FormLabel>
@@ -323,7 +261,6 @@ const Dashboard: React.FC = () => {
                         <Box>
                             <Flex gap={4} pt={5} pl={0} alignItems={'center'}>
                                 {[
-                                    { Request: requestdb },
                                     { 'Año': yearSelected },
                                     { Mes: monthSelected },
                                     { Estado: status }
@@ -352,17 +289,6 @@ const Dashboard: React.FC = () => {
 
                                     </Box>
                                 ))}
-                                {currentUser.role === ROLES.Admin ?
-                                    <Flex flex={1} alignContent={'flex-end'}>
-                                        <Button
-                                            size={'xs'}
-                                            ml={'auto'}
-                                            color={'green.500'}
-                                            leftIcon={<AiOutlineFileExcel />}
-                                            onClick={exportToExcelFn}
-                                        >Exportar a Excel</Button>
-                                    </Flex>
-                                    : null}
 
                             </Flex>
                         </Box>
@@ -398,7 +324,7 @@ const Dashboard: React.FC = () => {
                         <AlertDialogOverlay>
                             <AlertDialogContent>
                                 <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                                    Borrar {reservation?.data.projectId}
+                                    Borrar {reservation?.id}
                                 </AlertDialogHeader>
 
                                 <AlertDialogBody>Are you sure to delete this project? All related files will be deleted and you can't undo this action afterward.</AlertDialogBody>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Center, Flex, Spinner, Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react';
 import { useStore } from '../../hooks/useGlobalStore';
-import ReservationRow from './ReservationRow';
+import ReservationRow from './Row';
 import { ReservationObject } from '../../models/Reservation';
 
 interface ReservationListTableProps {
@@ -34,18 +34,18 @@ const ReservationListTable: React.FC<ReservationListTableProps> = ({ reservation
                         <Thead>
                             <Tr>
                                 <Th px={0} pl={'15px'}></Th>
-                                <Th px={1} textAlign={'center'}>Reserva</Th>
-                                <Th px={1} textAlign={'center'}>Cliente</Th>
-                                <Th px={1} textAlign={'center'}>Vehículo</Th>
-                                <Th px={1} textAlign={'center'}>Fecha Inicio</Th>
-                                <Th px={1} textAlign={'center'}>Fecha Fin</Th>
-                                <Th px={1} textAlign={'center'}>Status</Th>
+                                <Th px={1} textAlign={'center'}></Th>
+                                <Th px={1}>Cliente</Th>
+                                <Th px={1}>Vehículo</Th>
+                                <Th px={1}>Fecha Inicio</Th>
+                                <Th px={1}>Fecha Fin</Th>
+                                <Th px={1}>Status</Th>
                                 <Th maxW={20}></Th>
                             </Tr>
                         </Thead>
                         <Tbody>
                             {reservations.map((reservation: ReservationObject) => (
-                                <ReservationRow 
+                                <ReservationRow
                                     key={reservation.id}
                                     reservation={reservation}
                                     removeReservation={removeReservation} />

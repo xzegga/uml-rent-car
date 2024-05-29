@@ -5,7 +5,7 @@ export const ROLES = {
 } as const;
 
 export interface User {
-    userID: number; // Primary Key
+    userId: number; // Primary Key
     firstName: string;
     lastName: string;
     email: string;

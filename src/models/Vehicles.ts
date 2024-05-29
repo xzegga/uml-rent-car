@@ -1,9 +1,19 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface Vehicle {
-    vehicleID: number; 
+    vehicleId?: string; 
     brand: string;
     model: string;
     year: number;
     type: string;
     plate: string;
-    availability: boolean;
+    milleage: number;
+    available: boolean;
+    created: Timestamp;
+    documents?: Document[];
+}
+
+export interface VehicleObject {
+    id: string;
+    data: Vehicle;
 }

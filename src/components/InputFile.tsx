@@ -1,7 +1,7 @@
 import { Flex, Link, Text } from '@chakra-ui/react';
 import React, { useRef } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
-import { DocumentObject } from '../models/document';
+import { DocumentObject } from '../models/Document';
 
 interface InputFileProps {
     doc: DocumentObject;

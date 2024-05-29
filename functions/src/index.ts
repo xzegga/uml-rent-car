@@ -1,11 +1,13 @@
-import {onCall} from "firebase-functions/v2/https";
 import {initializeApp} from "firebase-admin/app";
+import {getAuth} from "firebase-admin/auth";
 import {getFirestore} from "firebase-admin/firestore";
+import {onCall} from "firebase-functions/v2/https";
+
 import getReservationData from "./endpoints/reservations";
 import setRoles from "./endpoints/roles";
-import getTenantsData from "./endpoints/tenants";
 import {removeUserData, saveUserData} from "./endpoints/users";
-import {getAuth} from "firebase-admin/auth";
+import getVehicleData from "./endpoints/vehicles";
+import getGarageData from "./endpoints/garages";
 
 initializeApp();
 const db = getFirestore();
@@ -15,13 +17,18 @@ export const assignUserClaims = onCall(async (request) => {
 });
 
 export const getReservations = onCall(async (request) => {
-  const projectsData = await getReservationData(db, request);
-  return projectsData;
+  const revData = await getReservationData(db, request);
+  return revData;
 });
 
-export const getTenants = onCall(async (request) => {
-  const tenants = await getTenantsData(db, request);
-  return tenants;
+export const getVehicles = onCall(async (request) => {
+  const vehicleData = await getVehicleData(db, request);
+  return vehicleData;
+});
+
+export const getGarages = onCall(async () => {
+  const vehicleData = await getGarageData(db);
+  return vehicleData;
 });
 
 export const saveUser = onCall(async (request) => {

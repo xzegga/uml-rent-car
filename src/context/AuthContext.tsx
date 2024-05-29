@@ -14,7 +14,7 @@ import firebase, {
 import { ROLES } from '../models/Users';
 import { useStore } from '../hooks/useGlobalStore';
 import { LoggedUser, initialGlobalState } from '../store/initialGlobalState';
-import { getUserById, validateSession } from '../data/users';
+import { getAllUsers, getOrSaveUserById, validateSession } from '../data/users';
 
 export type User = firebase.User | null;
 
@@ -105,12 +105,21 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ childr
 
   }
 
+  const getUsers = async (): Promise<User[]> => {
+    let users: any[] = [];
+    if (currentUser && currentUser.role === ROLES.Admin) {
+        const response = await getAllUsers();
+        users =  response.length ? response : [] as User[];
+    }
+    return users;
+}
+
   const loginSuccess = async (usr: any) => {
     if (usr) {
       // Read claims from the user object
 
       const { claims } = await usr.getIdTokenResult();
-      console.log(claims)
+
       if (claims) {
         const user = {
           ...currentUser,
@@ -118,16 +127,19 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ childr
           photoUrl: usr.photoURL,
           email: usr.email,
           uid: usr.uid,
-          role: claims.role || ROLES.Unauthorized,
-          tenant: claims.tenant,
-          department: claims.department,
+          role: claims.role ? claims.role : ROLES.Client,
         } as LoggedUser
 
-        setState({
-          currentUser: { ...user, token: usr.accessToken }
-        });
+        const users: User[] = await getUsers();
 
-        await getUserById(user);
+        setState({
+          currentUser: {
+            ...user,
+            token: usr.accessToken,
+          },
+          users,
+        });
+        await getOrSaveUserById(user);
       }
     }
   }

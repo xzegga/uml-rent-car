@@ -1,14 +1,11 @@
 import { CheckCircleIcon, DeleteIcon } from '@chakra-ui/icons';
-import { List, ListItem, Flex, Box, ListIcon, Heading, Text, Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Link, useDisclosure } from '@chakra-ui/react';
+import { List, ListItem, Flex, Box, ListIcon, Heading, Text, Button } from '@chakra-ui/react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
 import { shortenFileName } from '../utils/helpers';
-import { languageCodes } from '../utils/languageCodes';
-import { Select } from "chakra-react-select";
 import './Styles.css';
-import Flag from './Flag';
-import { Doc } from '../models/document';
+import { Doc } from '../models/Document';
 
 interface DropZoneProps {
     setFileList: React.Dispatch<React.SetStateAction<Doc[]>>;
@@ -42,12 +39,10 @@ const rejectStyle = {
     borderColor: '#ff1744'
 };
 
-const DropZone: React.FC<DropZoneProps> = ({ setFileList, targetLanguage = 'Spanish' }) => {
+const DropZone: React.FC<DropZoneProps> = ({ setFileList }) => {
     // const [files, setFiles] = useState<File[]>([]);
     const [selectedFiles, setSelectedFile] = useState<Doc[]>([]);
-    const [index, setIndex] = useState<number>();
-    const [target, setTarget] = useState<string[]>([]);
-    const { isOpen, onOpen, onClose } = useDisclosure()
+
     const {
         getRootProps,
         getInputProps,
@@ -60,30 +55,14 @@ const DropZone: React.FC<DropZoneProps> = ({ setFileList, targetLanguage = 'Span
             setSelectedFile([
                 ...selectedFiles,
                 ...acceptedFiles.map(file => (
-                    { file, target: [targetLanguage.slice()] }
+                    { file }
                 ))
             ]);
         }
     });
 
-    const openFileWindows = ()=>{
+    const openFileWindows = () => {
         open();
-    }
-    const openModal = (file: File) => {
-        const idx = selectedFiles.findIndex(f => f.file === file);
-        setIndex(idx);
-        setTarget(selectedFiles[idx].target);
-        onOpen();
-    }
-
-    const closeModal = () => {
-        if (index !== undefined) {
-            const newState = selectedFiles.slice()
-            const current = newState[index];
-            current.target = target;
-            setSelectedFile(newState);
-        }
-        onClose();
     }
 
     useEffect(() => {
@@ -104,19 +83,6 @@ const DropZone: React.FC<DropZoneProps> = ({ setFileList, targetLanguage = 'Span
                             <ListIcon as={CheckCircleIcon} color='green.500' />
                             {shortenFileName(file.name, 20)}
                         </Box>
-                        <Box textAlign={'left'}>
-
-                            <Flex alignItems={
-                                'center'
-                            }>
-                                <Link color='blue.400' onClick={() => openModal(file)}><Text mr="3" fontSize={14}>Set languages</Text></Link>
-                                {doc.target.map(t => (
-                                    <Flag key={t} name={t} />
-                                ))}
-
-
-                            </Flex>
-                        </Box>
                     </Flex>
                     <DeleteIcon onClick={() => removeFile(file)} cursor={'pointer'} color={'red.400'} />
                 </Flex>
@@ -135,16 +101,14 @@ const DropZone: React.FC<DropZoneProps> = ({ setFileList, targetLanguage = 'Span
         isDragReject
     ]);
 
-    const selectedOptions = languageCodes.filter(lg => target.includes(lg.label));
-
     return (
         <>
             <Flex flexDirection={'column'} justifyContent={'center'} minH={'100%'} cursor={'pointer'}>
                 <Box {...getRootProps({ style, className: 'dropzone' })} flex={1} justifyContent={'center'}>
                     <input {...getInputProps()} />
                     <Flex direction={'column'} alignItems={'center'}>
-                        <Text mb={3} colorScheme={'blue.900'} fontWeight={'bold'}>Drag 'n' drop some files here, or click to select files</Text>
-                        <Button leftIcon={<AiOutlineCloudUpload />} onClick={openFileWindows}>Upload Files</Button>
+                        <Text mb={3} colorScheme={'blue.900'} fontWeight={'bold'}>Arrastra y suelta la imagen aquí, o haz clic para seleccionar archivos.</Text>
+                        <Button leftIcon={<AiOutlineCloudUpload />} onClick={openFileWindows}>Subir Archivo</Button>
                     </Flex>
                 </Box>
                 <Box>
@@ -154,28 +118,6 @@ const DropZone: React.FC<DropZoneProps> = ({ setFileList, targetLanguage = 'Span
                     </List>
                 </Box>
             </Flex>
-
-            <Modal onClose={onClose} size={'md'} isOpen={isOpen} isCentered>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Choose or remove languages</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <Select
-                            isMulti
-                            defaultValue={selectedOptions}
-                            options={languageCodes}
-                            placeholder={'Search for...'}
-                            onChange={(sl) => {
-                                setTarget(sl.map(t => t.label))
-                            }}
-                        />
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button colorScheme={'blue'} onClick={() => closeModal()}>Set Languages</Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
         </>
     );
 };

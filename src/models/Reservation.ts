@@ -1,16 +1,15 @@
 import { Timestamp } from 'firebase/firestore';
 
 export interface Reservation {
-    reservationId: number;
-    vehicleID: number;
-    clientID: number;
-    startDate: Timestamp;
-    endDate: Timestamp;
+    vehicleId: string;
+    userId: string;
+    startDate: Timestamp | null;
+    endDate: Timestamp | null;
     mileageUsed: number;
-    deliveryTime: Timestamp;
+    pickupPlace: string;
     status: string;
+    deliveryTime?: Timestamp;
     created: Timestamp;
-    tenant: string;
 }
 
 export interface ReservationObject {

@@ -1,6 +1,7 @@
 import { User } from "../context/AuthContext";
-import { Tenant } from "../models/Clients";
+import { GarageObject } from "../models/Garaje";
 import { ROLES } from "../models/Users";
+import { VehicleObject } from "../models/Vehicles";
 
 export const localStorageKeys = [];
 export const sessionStorageKeys = [];
@@ -9,7 +10,6 @@ type Role = typeof ROLES[keyof typeof ROLES];
 
 export type LoggedUser = {
   uid: string,
-  tenant: string,
   role: Role,
   department: string,
   name: string,
@@ -27,9 +27,10 @@ export const initialGlobalState = {
   loading: false,
   loadingMore: false,
   currentUser: {} as LoggedUser,
-  tenant: {} as Tenant,
-  tenants: [] as Tenant[],
-  tenantQuery: '',
   selectedIds: [] as string[],
   refresh: false,
+  users: [] as User[],
+  vehicles: [] as VehicleObject[],
+  metaData: {} as any,
+  garages: [] as GarageObject[],
 };

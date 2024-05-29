@@ -35,7 +35,7 @@ const Login: React.FC = () => {
 
     const goToPage = () => {
         if (currentUser?.uid && currentUser?.role) {
-            navigate(`/${currentUser?.role}/`, { replace: false })
+            navigate(`/`, { replace: false })
         }
     }
 

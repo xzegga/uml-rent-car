@@ -1,8 +1,8 @@
-import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../utils/init-firebase';
 import { LoggedUser } from '../store/initialGlobalState';
 import { removeUndefinedProps } from '../utils/removeUndefined';
-import { ROLES } from '../models/Users';
+import { User } from '../models/Users';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 
 export const getAllUsers = async () => {
@@ -16,17 +16,39 @@ export const getAllUsers = async () => {
     return result;
 };
 
-export const getUserById = async (user: LoggedUser): Promise<void> => {
+
+export const getUserDataById = async (id: string) => {
+    const docRef = doc(collection(db, 'users'), id);
+    const docSnap = await getDoc(docRef);
+    return {
+        id: docSnap.id,
+        data: docSnap.data() as User
+    };
+};
+
+
+export const getOrSaveUserById = async (user: LoggedUser): Promise<any> => {
     try {
         const userCollection = collection(db, 'users');
         const querySnapshot = await getDocs(query(userCollection, where('uid', '==', user.uid)));
 
         if (querySnapshot.empty) {
-            await addDoc(userCollection, {
+            const docRef = await doc(collection(db, 'users'), user.uid);
+            await setDoc(docRef, {
                 ...removeUndefinedProps(user),
-                role: ROLES.Unauthorized
             });
+
+
+            // await addDoc(userCollection, {
+            //     ...removeUndefinedProps(user),
+            //     role: ROLES.Unauthorized
+            // }, user.uid as string);
         }
+
+       return querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            data: doc.data()
+        }))
 
     } catch (error) {
         console.log('Error getting user by ID:', error);
@@ -72,5 +94,4 @@ export const removeUser = async (token: string, uid: string, id: string): Promis
     } catch (error: any) {
         return error;
     }
-   
 };

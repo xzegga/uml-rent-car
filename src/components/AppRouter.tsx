@@ -1,42 +1,54 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
+import { ROLES } from '../models/Users';
+import Home from '../pages';
 import Users from '../pages/admin/Users';
-import AddReservation from '../pages/shared/AddReservation';
 import Dashboard from '../pages/client/Dashboard';
-import ReservationDetail from '../pages/shared/ReservationDetail';
+import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import Login from '../pages/Login';
+import Registre from '../pages/Registre';
+import ResetPasswordPage from '../pages/ResetPasswordPage';
+import AddReservation from '../pages/shared/AddReservation';
+import AddVehicle from '../pages/admin/AddVehicle';
+import ReservationDetail from '../pages/shared/ReservationDetail';
 import Unauthorized from '../pages/Unauthorized';
 import Layout from './Layout';
 import ProtectedRoute from './ProtectedRoute';
-import Registre from '../pages/Registre';
-import ForgotPasswordPage from '../pages/ForgotPasswordPage';
-import ResetPasswordPage from '../pages/ResetPasswordPage';
-import Tenants from '../pages/admin/Tenants';
-import { ROLES } from '../models/Users';
-
+import AddGarage from '../pages/admin/AddGarage';
+import Garages from '../pages/admin/Garages';
+import Vehicles from '../pages/admin/Vehicles';
 
 const AppRouter: React.FC = () => {
     return (
         <BrowserRouter>
             <Routes>
                 <Route path='/' element={<Layout />}>
-                    <Route path="" element={<Login />}></Route>
+                    <Route path="" element={<Home />}></Route>
                     <Route path="login" element={<Login />}></Route>
                     <Route path="register" element={<Registre />}></Route>
                     <Route path="unauthorized" element={<Unauthorized />} />
                     <Route path="forgot-password" element={<ForgotPasswordPage />} />
                     <Route path="reset-password" element={<ResetPasswordPage />} />
                     <Route path="/" element={<ProtectedRoute allowedRoles={ROLES.Client} />} >
-                        <Route path="client" element={<Dashboard />} />
-                        <Route path="client/project/:projectId" element={<ReservationDetail />} />
-                        <Route path="client/projects/add" element={<AddReservation />} />
+                        <Route path="client/rentals" element={<Dashboard />} />
+                        <Route path="client/rentals/:id" element={<ReservationDetail />} />
+                        <Route path="client/rentals/add/:id" element={<AddReservation />} />
                     </Route>
                     <Route path="/" element={<ProtectedRoute allowedRoles={ROLES.Admin} />} >
-                        <Route path="admin" element={<Dashboard />} />
+
+
+                        <Route path="admin/rentals" element={<Dashboard />} />
+                        <Route path="admin/rentals/add/:id" element={<AddReservation />} />
+                        <Route path="admin/rentals/:id" element={<ReservationDetail />} />
+
                         <Route path="admin/users" element={<Users />} />
-                        <Route path="admin/clients" element={<Tenants />} />
-                        <Route path="admin/project/:projectId" element={<ReservationDetail />} />
-                        <Route path="admin/projects/add" element={<AddReservation />} />
+
+                        <Route path="admin/vehicles" element={<Vehicles />} />
+                        <Route path="admin/vehicles/add" element={<AddVehicle />} />
+
+                        <Route path="admin/garages" element={<Garages />} />
+                        <Route path="admin/garages/add" element={<AddGarage />} />
                     </Route>
                 </Route>
             </Routes>

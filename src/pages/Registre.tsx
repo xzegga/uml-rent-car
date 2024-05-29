@@ -53,7 +53,7 @@ const Registre: React.FC = () => {
                                     duration: 9000,
                                     isClosable: true,
                                 })
-                                return navigate('/unauthorized')
+                                return navigate('/')
                             })
                             .catch((error: { message: any; }) => {
                                 toast({

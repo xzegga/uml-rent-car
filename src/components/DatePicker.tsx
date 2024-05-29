@@ -7,11 +7,12 @@ import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { format, isValid, addDays } from 'date-fns'
 
 interface DatePickerProps {
-    handleDate: Function;
+    handleDate: (...args: any[]) => void;
+    field: string;
     restrictDate?: boolean;
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({ handleDate, restrictDate = false }) => {
+const DatePicker: React.FC<DatePickerProps> = ({ handleDate, field, restrictDate = false }) => {
 
     const [date, setDate] = useState<CalendarDate>()
     const [value, setValue] = useState('')
@@ -46,7 +47,7 @@ const DatePicker: React.FC<DatePickerProps> = ({ handleDate, restrictDate = fals
 
     useEffect(() => {
         const date = new Date(value)
-        return handleDate(date)
+        return handleDate(date, field)
 
     }, [value])
 
@@ -54,7 +55,7 @@ const DatePicker: React.FC<DatePickerProps> = ({ handleDate, restrictDate = fals
         <ChakraProvider theme={CalendarDefaultTheme}>
             <Box>
                 <Popover
-                    placement="auto-start"
+                    placement="bottom-start"
                     isOpen={isOpen}
                     onClose={onClose}
                     initialFocusRef={initialRef}

@@ -4,10 +4,6 @@ export interface Document {
     created: Timestamp;
     name: string;
     path: string;
-    target: string[];
-    type: string;
-    language?: string;
-    isCertificate?: boolean;
 }
 
 export interface DocumentObject {
@@ -17,7 +13,6 @@ export interface DocumentObject {
 
 export interface Doc {
     file: File;
-    target: string[]
 }
 
 export interface ProcessedDocument {

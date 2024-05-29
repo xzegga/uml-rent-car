@@ -1,11 +1,10 @@
 import {logger} from "firebase-functions/v2";
 import {CallableRequest, HttpsError} from "firebase-functions/v2/https";
 import getWereByDate from "../were/were-by-date";
-import getWhereByRequestId from "../were/were-by-request-id";
 import getWereByStatus from "../were/were-by-status";
 import {Filter} from "../types/types";
 import {DecodedIdToken, getAuth} from "firebase-admin/auth";
-import getWereByTenant from "../were/were-by-tenant";
+import getWereByUserId from "../were/were-by-user";
 
 /**
  * Retrieves reservation data based on specified filters and pagination options.
@@ -25,12 +24,11 @@ export default async function getReservationData(
     status,
     monthSelected,
     yearSelected,
-    requestdb,
     pagination,
     lastDoc,
     newQuery,
     token,
-    tenant,
+    userId,
   } = request.data as any;
 
   const auth = getAuth();
@@ -46,21 +44,10 @@ export default async function getReservationData(
 
   const whereClause: Filter[] = [];
 
-  if (requestdb !== "") {
-    await getWhereByRequestId(requestdb, whereClause);
-  } else {
-    // Building where clause array
-    await getWereByStatus(status, whereClause);
-    await getWereByDate(monthSelected, yearSelected, whereClause);
-  }
+  if (userId) await getWereByUserId(userId, whereClause);
 
-  if (validToken?.tenant && validToken?.role !== "admin") {
-    await getWereByTenant(validToken, whereClause);
-  } else {
-    if (tenant && tenant !== "all") {
-      await getWereByTenant(validToken, whereClause, tenant);
-    }
-  }
+  await getWereByStatus(status, whereClause);
+  await getWereByDate(monthSelected, yearSelected, whereClause);
 
   try {
     const collectionRef = db.collection("reservations");
@@ -108,6 +95,6 @@ export default async function getReservationData(
       "Error al tratar de establecer los filtros seleccionados",
       error
     );
-    throw new HttpsError("internal", "Error al obtener las reservas");
+    throw new HttpsError("internal", "Error al obtener las reservas", error);
   }
 }

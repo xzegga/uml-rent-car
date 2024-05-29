@@ -38,7 +38,7 @@ export default async function setRoles(request: CallableRequest<any>) {
       error
     );
     return new HttpsError(
-      "internal", `Error al asignar el rol: (${error.message})`
+      "internal", `Error al asignar el rol: (${error.message})`, error
     );
   }
 }

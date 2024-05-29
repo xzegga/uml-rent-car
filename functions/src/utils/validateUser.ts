@@ -1,6 +1,12 @@
 import {DecodedIdToken, getAuth} from "firebase-admin/auth";
 import {HttpsError} from "firebase-functions/v2/https";
-import {ROLES} from "../endpoints/tenants";
+
+export const ROLES = {
+  Admin: "admin",
+  Client: "client",
+  Unauthorized: "unauthorized",
+} as const;
+
 
 /**
  * Validate user token sent

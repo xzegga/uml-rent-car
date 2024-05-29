@@ -1,17 +1,21 @@
 import { Timestamp } from 'firebase/firestore';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 
 import {
-    Box, Checkbox, Flex, IconButton, Link, LinkBox, Td, Text, Tr,
-    useToast
+    Box, Checkbox, Flex, IconButton, LinkBox, Td, Tr,
+    useToast, Image,
+    VStack
 } from '@chakra-ui/react';
 
 import { useStore } from '../../hooks/useGlobalStore';
 import { transfromTimestamp } from '../../utils/helpers';
 import Status from '../Status';
 import { ReservationObject } from '../../models/Reservation';
+import { getDocuments } from '../../data/Documents';
+import { getVehicleById } from '../../data/Vehicles';
+import { getUserDataById } from '../../data/users';
 
 interface ReservationRowProps {
     reservation: ReservationObject;
@@ -25,8 +29,9 @@ const stripped = {
 
 const ReservationRow: React.FC<ReservationRowProps> = ({ reservation, removeReservation }) => {
     const navigate = useNavigate();
-    const { selectedIds, setState } = useStore();
+    const { selectedIds, setState, currentUser } = useStore();
     const toast = useToast()
+    const [metaData, setMetadata] = React.useState<any>();
 
     const convertTimeStamp = (time: any) => {
         const timeStamp = new Timestamp(time._seconds, time._nanoseconds);
@@ -60,93 +65,93 @@ const ReservationRow: React.FC<ReservationRowProps> = ({ reservation, removeRese
         }
     }
 
+    useEffect(() => {
+        getVehicleData();
+    }, []);
+
+    const getVehicleData = async () => {
+        const result = await getDocuments(reservation.data.vehicleId);
+        const vehicle = await getVehicleById(reservation.data.vehicleId);
+        const user = await getUserDataById(reservation.data.userId);
+        const metaData = {
+            id: reservation.id,
+            data: vehicle.data,
+            image: result?.length ? result[0] : '',
+            user: user.data,
+        }
+        console.log({ metaData });
+        setMetadata(metaData);
+    };
+
+    const handleGoToReservation = (id: string) => {
+        navigate(`/${currentUser.role}/rentals/${id}`);
+    }
+
     return (
 
         <Tr cursor={'pointer'} _hover={{ bg: 'gray.100' }} style={reservation.data.status === 'Archived' ? stripped : {}}>
             <Td px={0} pl={1}>
                 <Checkbox isChecked={selectedIds.includes(reservation.id)} onChange={(e) => handleSelected(e, reservation.id)}></Checkbox>
             </Td>
+            <Td px={2}>
+                {metaData?.image !== '' ? (
+                    <Image
+                        borderRadius="lg"
+                        width="65px"
+                        src={metaData?.image}
+                        loading='lazy'
+                    />
+                ) : null}
+            </Td>
             <LinkBox
                 as={Td}
                 py={1.5} px={1.5}
-                onClick={() => {
-                    navigate(`project/${reservation.id}`);
-                }}
-                cursor={'pointer'}
-                _hover={{ bg: 'gray.100' }}
-            >
-                <Link color={'blue.400'}>
-                    <Text whiteSpace={'nowrap'}>{reservation?.data?.reservationId}</Text>
-                </Link>
-            </LinkBox>
-            <LinkBox
-                as={Td}
-                py={1.5} px={1.5}
-                onClick={() => {
-                    navigate(`project/${reservation.id}`);
-                }}
+                onClick={() => handleGoToReservation(reservation.id)}
                 cursor={'pointer'}
                 _hover={{ bg: 'gray.100' }}
             >
                 <Flex alignItems={'center'}>
-                    {reservation?.data?.clientID}
+                    <VStack alignItems={'flex-start'}>
+                        <Box>{metaData?.user?.email}</Box>
+                        <Box>Fecha: {reservation.data.startDate && convertTimeStamp(reservation.data.startDate)}</Box>
+                    </VStack>
                 </Flex>
             </LinkBox>
             <LinkBox
                 as={Td}
                 py={1.5} px={1.5}
-                onClick={() => {
-                    navigate(`project/${reservation.id}`);
-                }}
+                onClick={() => handleGoToReservation(reservation.id)}
                 cursor={'pointer'}
                 _hover={{ bg: 'gray.100' }}
             >
                 <Flex alignItems={'center'}>
-                    {reservation?.data?.vehicleID}
+                    {metaData?.data?.brand} {metaData?.data?.model} {metaData?.data?.year}
                 </Flex>
             </LinkBox>
             <LinkBox
                 py={1.5} px={1.5}
                 as={Td}
-                onClick={() => {
-                    navigate(`project/${reservation.id}`);
-                }}
+                onClick={() => handleGoToReservation(reservation.id)}
                 cursor={'pointer'}
                 style={{ whiteSpace: 'nowrap' }}
                 _hover={{ bg: 'gray.100' }}
             >
-                {reservation.data.created && convertTimeStamp(reservation.data.startDate)}
+                {reservation.data.startDate && convertTimeStamp(reservation.data.startDate)}
             </LinkBox>
             <LinkBox
                 py={1.5} px={1.5}
                 as={Td}
-                onClick={() => {
-                    navigate(`project/${reservation.id}`);
-                }}
+                onClick={() => handleGoToReservation(reservation.id)}
                 cursor={'pointer'}
                 style={{ whiteSpace: 'nowrap' }}
                 _hover={{ bg: 'gray.100' }}
             >
-                {reservation.data.created && convertTimeStamp(reservation.data.endDate)}
-            </LinkBox>
-            <LinkBox
-                py={1.5} px={1.5}
-                as={Td}
-                onClick={() => {
-                    navigate(`project/${reservation.id}`);
-                }}
-                cursor={'pointer'}
-                style={{ whiteSpace: 'nowrap' }}
-                _hover={{ bg: 'gray.100' }}
-            >
-                {reservation.data.created && convertTimeStamp(reservation.data.created)}
+                {reservation.data.endDate && convertTimeStamp(reservation.data.endDate)}
             </LinkBox>
             <LinkBox
                 as={Td}
                 py={1.5} px={1.5}
-                onClick={() => {
-                    navigate(`project/${reservation.id}`);
-                }}
+                onClick={() => handleGoToReservation(reservation.id)}
                 cursor={'pointer'}
                 _hover={{ bg: 'gray.100' }}
             >
@@ -156,18 +161,18 @@ const ReservationRow: React.FC<ReservationRowProps> = ({ reservation, removeRese
             <Td maxW={15} p={0}>
                 <Flex>
 
-                        <Box maxW={'30%'} w={'30%'}>
-                            <IconButton
-                                variant="ghost"
-                                height={10}
-                                icon={<RiDeleteBin6Line color={'#f84141'} />}
-                                aria-label="toggle-dark-mode"
-                                onClick={() => {
-                                    removeReservation(reservation);
-                                }}
-                                disabled={reservation.data.status !== 'Received'}
-                            />
-                        </Box>
+                    <Box maxW={'30%'} w={'30%'}>
+                        <IconButton
+                            variant="ghost"
+                            height={10}
+                            icon={<RiDeleteBin6Line color={'#f84141'} />}
+                            aria-label="toggle-dark-mode"
+                            onClick={() => {
+                                removeReservation(reservation);
+                            }}
+                            disabled={reservation.data.status !== 'Received'}
+                        />
+                    </Box>
                 </Flex>
             </Td>
         </Tr>
