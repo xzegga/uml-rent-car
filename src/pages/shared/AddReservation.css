@@ -26,6 +26,9 @@
 .calendar-times {
     min-width: 328px!important;
 }
+.calendar-date {
+    min-width: 240px!important;
+}
 
 .react-datepicker__input-container input {
     width: 100%;
@@ -55,3 +58,11 @@
     background: inherit;
     color: #fff;
 }
+
+.demo {
+    padding: 2rem;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+    box-shadow: 0 5px 5px -5px #00000088;
+    border: solid 1px #dddddd;
+  }

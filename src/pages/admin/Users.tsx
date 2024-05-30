@@ -1,22 +1,21 @@
-import { Table, Thead, Tr, Th, Tbody, Td, Button, Select, Image, Flex, Text, Box, useToast, AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Breadcrumb, BreadcrumbItem, Spacer, InputGroup, FormLabel, FormControl, Input, FormErrorMessage, Spinner, Heading, Container } from '@chakra-ui/react';
+import {
+    Table, Thead, Tr, Th, Tbody, Td, Button, Select, Image, Flex, Text,
+    Box, useToast, AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter,
+    AlertDialogHeader, AlertDialogOverlay, Breadcrumb, BreadcrumbItem, Spacer,
+    Spinner, Heading, Container,
+} from '@chakra-ui/react';
 import { setDoc, doc } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from "firebase/functions";
 import 'firebase/functions'; // Import the functions module
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { db } from '../../utils/init-firebase';
 import { ROLES } from '../../models/Users';
 import { useStore } from '../../hooks/useGlobalStore';
-import MaxTextTooltip from '../../components/MaxTextTooltip';
-import { getAllUsers, removeUser, saveUser } from '../../data/users';
+import { getAllUsers, removeUser } from '../../data/users';
 import { useAuth } from '../../context/AuthContext';
 import Navigation from '../../components/Navigation';
 
-const initialUser = {
-    email: '',
-    password: '',
-    role: ROLES.Client,
-}
 
 const Users: React.FC = () => {
     const { currentUser, loading, setState } = useStore();
@@ -27,11 +26,7 @@ const Users: React.FC = () => {
     const onClose = () => setIsOpen(false)
     const cancelRef = useRef(null)
     const [user, setUser] = useState<any>({})
-    const [newUser, setNewUser] = useState<{
-        email: string,
-        password: string,
-        role?: string,
-    }>(initialUser);
+    const navigate = useNavigate();
 
     useEffect(() => {
         getUsers();
@@ -124,52 +119,29 @@ const Users: React.FC = () => {
         }
     }
 
-    const handleNewUser = (e: { target: { name: any; value: any; }; }) => {
-        const usr = {
-            ...newUser,
-            [e.target.name]: e.target.value
-        }
-        setNewUser(usr);
-    }
-
-    const submitUser = async () => {
-        setState({ loading: true })
-        if (newUser) {
-            await validate();
-            const saved = await saveUser(currentUser.token, newUser)
-            if (saved) {
-                setUsers([
-                    ...users,
-                    saved
-                ])
-            }
-        }
-        setState({ loading: false })
-        setNewUser(initialUser)
-    }
 
     return (
         <>
             <Container maxW="container.lg" w={'container.lg'} overflowX="auto" py={4}>
                 <Flex mb="1" alignItems={'start'}>
-                            <Box>
-                                <Heading size="md" whiteSpace={'nowrap'} pl={0}>
-                                    <Flex alignItems={'center'} gap={3}>
-                                        <Text>Usuarios</Text>
-                                    </Flex>
-                                </Heading>
-                                <Breadcrumb separator="/">
-                                    <BreadcrumbItem>
-                                        <NavLink to={`/`}>Inicio</NavLink>
-                                    </BreadcrumbItem>
-                                    <BreadcrumbItem>
-                                        <Text>Usuarios</Text>
-                                    </BreadcrumbItem>
-                                </Breadcrumb>
-                            </Box>
-                            <Spacer />
-                            <Navigation />
-                        </Flex>
+                    <Box>
+                        <Heading size="md" whiteSpace={'nowrap'} pl={0}>
+                            <Flex alignItems={'center'} gap={3}>
+                                <Text>Usuarios</Text>
+                            </Flex>
+                        </Heading>
+                        <Breadcrumb separator="/">
+                            <BreadcrumbItem>
+                                <NavLink to={`/`}>Inicio</NavLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbItem>
+                                <Text>Usuarios</Text>
+                            </BreadcrumbItem>
+                        </Breadcrumb>
+                    </Box>
+                    <Spacer />
+                    <Navigation />
+                </Flex>
                 <Box pt={10} mb={8}>
                     <Flex mb='10'>
                         <Box>
@@ -186,53 +158,7 @@ const Users: React.FC = () => {
                         <Spacer />
                     </Flex>
                 </Box>
-                <Box mb={10}>
-                    <Flex gap={4} alignItems={'end'} justifyContent={'start'}>
-                        <FormControl id="email" flex={2} isInvalid={newUser?.email === ''}>
-                            <Flex alignItems={'center'}>
-                                <FormLabel>Email</FormLabel>
-                                {!newUser?.email && <FormErrorMessage mt={0} mb={2}>(* Required)</FormErrorMessage>}
-                            </Flex>
-                            <InputGroup borderColor="#E0E1E7" display={'flex'} flexDirection={'column'}>
-                                <Input placeholder=""
-                                    name="email" id="email" value={newUser?.email}
-                                    onChange={handleNewUser}
-                                    required />
-
-                            </InputGroup>
-                        </FormControl>
-                        <FormControl id="password" flex={2} isInvalid={newUser?.password === ''}>
-                            <Flex alignItems={'center'}>
-                                <FormLabel>Contraseña</FormLabel>
-                                {!newUser?.password && <FormErrorMessage mt={0} mb={2}>(* Required)</FormErrorMessage>}
-                            </Flex>
-                            <InputGroup borderColor="#E0E1E7" display={'flex'} flexDirection={'column'}>
-                                <Input placeholder=""
-                                    name="password" id="password" value={newUser?.password}
-                                    onChange={handleNewUser}
-                                    required />
-
-                            </InputGroup>
-                        </FormControl>
-
-                        <FormControl id="logo" flex={1}>
-                            <InputGroup>
-                                <Flex gap={2}>
-                                    <Button
-                                        isLoading={false}
-                                        colorScheme={'blue'}
-                                        loadingText='Saving'
-                                        onClick={submitUser}
-                                        spinnerPlacement='start'
-                                        isDisabled={!newUser?.email || !newUser?.password}
-                                    ><Text>Add User</Text>
-                                    </Button>
-                                </Flex>
-                            </InputGroup>
-                        </FormControl>
-                    </Flex>
-                </Box>
-                <Box position={'relative'}>
+                <Box position={'relative'} mb={10}>
                     {loading && <Flex
                         h={'100%'}
                         style={{
@@ -266,13 +192,10 @@ const Users: React.FC = () => {
                                                 <Text ml={3}>{user.data?.name}</Text>
                                             </Flex>
                                         </Td>
-                                        <Td maxW={'160px'}>
-                                            <MaxTextTooltip maxWidth={150}>
-                                                {user.data?.email}
-                                            </MaxTextTooltip>
+                                        <Td>
+                                            {user.data?.email}
                                         </Td>
-
-                                        <Td px={1.5} py={0.5}>
+                                        <Td px={1.5} py={0.5} >
                                             <Select
                                                 h={'30px'}
                                                 name="role"
@@ -287,11 +210,25 @@ const Users: React.FC = () => {
                                         </Td>
                                         <Td py={1.5} px={1.5}>
                                             <Button
-                                                h={'30px'} disabled={user.data?.role === ROLES.Admin} variant="outline" onClick={() => {
+                                                h={'30px'} mr={2} variant="outline"
+                                                colorScheme='red'
+                                                onClick={() => {
                                                     setIsOpen(true);
                                                     setUser(user);
-                                                }}>Eliminar</Button>
+                                                }}>
+                                                Eliminar
+                                            </Button>
+
+                                            <Button
+                                                onClick={() => navigate(`/admin/users/${user.id}`, { replace: true })}
+                                                mr={5}
+                                                h={'30px'}
+                                                variant="outline"
+                                            >
+                                                Ver detalles
+                                            </Button>
                                         </Td>
+
                                     </Tr>
                                 ))}
                             </Tbody>
@@ -307,11 +244,11 @@ const Users: React.FC = () => {
                     <AlertDialogOverlay>
                         <AlertDialogContent>
                             <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                                Delete Customer
+                                Eliminar Usuario
                             </AlertDialogHeader>
 
                             <AlertDialogBody>
-                                Are you sure? You can't undo this action afterwards.
+                                ¿Estás seguro? No podrás deshacer esta acción posteriormente.
                             </AlertDialogBody>
 
                             <AlertDialogFooter>
@@ -319,7 +256,7 @@ const Users: React.FC = () => {
                                     Cancel
                                 </Button>
                                 <Button colorScheme='red' onClick={handleDeleteUser} ml={3}>
-                                    Delete
+                                    Eliminar
                                 </Button>
                             </AlertDialogFooter>
                         </AlertDialogContent>

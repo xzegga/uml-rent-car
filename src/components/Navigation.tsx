@@ -21,7 +21,7 @@ export default function Navigation() {
             </Link>
             
             <Link onClick={() => navigate('/admin/garages', { replace: true })} colorScheme={'blue.700'} mr={5}>
-                Garages
+                Garajes
             </Link>
             <Link onClick={() => navigate('/admin/vehicles', { replace: true })} colorScheme={'blue.700'}  mr={5}>
                 Vehículos
@@ -36,6 +36,9 @@ export default function Navigation() {
 
             <Link onClick={() => navigate('/client/rentals', { replace: true })} colorScheme={'blue.700'} mr={5}>
                 Reservas
+            </Link>
+            <Link onClick={() => navigate('/client/profile', { replace: true })} colorScheme={'blue.700'}>
+                Mi Perfil
             </Link>
             </>
         }

@@ -62,9 +62,6 @@ const Row: React.FC<RowProps> = ({ row, removeRow }) => {
             <LinkBox
                 py={1.5} px={1.5}
                 as={Td}
-                onClick={() => {
-                    navigate(`project/${row.id}`);
-                }}
                 cursor={'pointer'}
                 style={{ whiteSpace: 'nowrap' }}
                 _hover={{ bg: 'gray.100' }}
@@ -74,9 +71,6 @@ const Row: React.FC<RowProps> = ({ row, removeRow }) => {
             <LinkBox
                 py={1.5} px={1.5}
                 as={Td}
-                onClick={() => {
-                    navigate(`project/${row.id}`);
-                }}
                 cursor={'pointer'}
                 style={{ whiteSpace: 'nowrap' }}
                 _hover={{ bg: 'gray.100' }}

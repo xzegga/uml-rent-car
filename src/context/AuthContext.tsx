@@ -11,18 +11,11 @@ import firebase, {
   confirmPasswordReset
 } from 'firebase/auth'
 
-import { ROLES } from '../models/Users';
+import { ROLES, User } from '../models/Users';
 import { useStore } from '../hooks/useGlobalStore';
-import { LoggedUser, initialGlobalState } from '../store/initialGlobalState';
+import { initialGlobalState } from '../store/initialGlobalState';
 import { getAllUsers, getOrSaveUserById, validateSession } from '../data/users';
 
-export type User = firebase.User | null;
-
-type Roles = {
-  role: keyof typeof ROLES;
-}
-
-export type UserWithRoles = User & Roles;
 
 type ContextState = {
   signInWithGoogle: () => Promise<firebase.UserCredential | undefined>,
@@ -128,18 +121,21 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ childr
           email: usr.email,
           uid: usr.uid,
           role: claims.role ? claims.role : ROLES.Client,
-        } as LoggedUser
+        } as User
 
-        const users: User[] = await getUsers();
-
+        let users = [] as User[];
+        if (claims.role === ROLES.Admin) {
+          users = await getUsers();
+        }
+        const [ { data: savedUser } ] = await getOrSaveUserById(user);
+        console.log('userSaved', savedUser);
         setState({
           currentUser: {
-            ...user,
+            ...savedUser,
             token: usr.accessToken,
           },
           users,
         });
-        await getOrSaveUserById(user);
       }
     }
   }

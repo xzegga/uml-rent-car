@@ -34,7 +34,6 @@ const ListTable: React.FC<ListTableProps> = ({ rows, removeRow }) => {
                             <Tr>
                                 <Th px={1}>Nombre</Th>
                                 <Th px={1}>Dirección</Th>
-                                <Th px={1}>Capacidad</Th>
                                 <Th px={1}>Vehículo Asignado</Th>
                                 <Th maxW={20}></Th>
                             </Tr>

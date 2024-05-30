@@ -1,22 +1,11 @@
-import { User } from "../context/AuthContext";
+
 import { GarageObject } from "../models/Garaje";
-import { ROLES } from "../models/Users";
+import { User } from "../models/Users";
 import { VehicleObject } from "../models/Vehicles";
 
 export const localStorageKeys = [];
 export const sessionStorageKeys = [];
 
-type Role = typeof ROLES[keyof typeof ROLES];
-
-export type LoggedUser = {
-  uid: string,
-  role: Role,
-  department: string,
-  name: string,
-  photoUrl: string,
-  email: string,
-  token: string,
-} & User;
 
 export const initialGlobalState = {
   title: 'Lets start',
@@ -26,7 +15,7 @@ export const initialGlobalState = {
   pagination: '20',
   loading: false,
   loadingMore: false,
-  currentUser: {} as LoggedUser,
+  currentUser: {} as User,
   selectedIds: [] as string[],
   refresh: false,
   users: [] as User[],

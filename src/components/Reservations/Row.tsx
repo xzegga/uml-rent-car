@@ -90,9 +90,10 @@ const ReservationRow: React.FC<ReservationRowProps> = ({ reservation, removeRese
     return (
 
         <Tr cursor={'pointer'} _hover={{ bg: 'gray.100' }} style={reservation.data.status === 'Archived' ? stripped : {}}>
+            {currentUser.role === 'admin' && (
             <Td px={0} pl={1}>
                 <Checkbox isChecked={selectedIds.includes(reservation.id)} onChange={(e) => handleSelected(e, reservation.id)}></Checkbox>
-            </Td>
+            </Td>) }
             <Td px={2}>
                 {metaData?.image !== '' ? (
                     <Image

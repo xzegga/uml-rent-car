@@ -8,7 +8,6 @@ import {
 } from '@chakra-ui/react';
 
 import ChangeStatusSelector from '../../components/ChangeStatus';
-import NavLnk from '../../components/NavLnk';
 import ReservationListTable from '../../components/Reservations/ListTable';
 import { useAuth } from '../../context/AuthContext';
 import { deleteReservation } from '../../data/Reservations';
@@ -62,7 +61,7 @@ const Dashboard: React.FC = () => {
             await validate();
             await deleteReservation(reservation.id);
             await updateAvailability([reservation.data.vehicleId], true);
-            
+
             toast({
                 title: 'Reservacion borrada',
                 description: 'La reserva ha sido eliminada',
@@ -175,21 +174,11 @@ const Dashboard: React.FC = () => {
                                     <Text>Autos Rentados</Text>
                                 </Flex>
                             </Heading>
-                            
+
                             <Spacer />
                             <Navigation />
                         </Flex>
-                        <Box pt={10}>
-                            <Box>
-                                <Flex justifyContent={'flex-end'}>
-                                    <Box>
-                                        <NavLnk to="/client/reservation/add" name="Vehículo Nuevo" colorScheme="blue.500" bg="blue.700" size="md" color="white">
-                                            Vehículo Nuevo
-                                        </NavLnk>
-                                    </Box>
-                                </Flex>
-                            </Box>
-                        </Box>
+
                         <Box pt={10}>
                             <Box>
                                 <Flex justifyContent={'flex-end'}>
@@ -327,7 +316,7 @@ const Dashboard: React.FC = () => {
                                     Borrar {reservation?.id}
                                 </AlertDialogHeader>
 
-                                <AlertDialogBody>Are you sure to delete this project? All related files will be deleted and you can't undo this action afterward.</AlertDialogBody>
+                                <AlertDialogBody>¿Estás seguro de que deseas eliminar esta reservación? Todos los archivos relacionados serán eliminados y no podrás deshacer esta acción posteriormente.</AlertDialogBody>
 
                                 <AlertDialogFooter>
                                     <Button ref={cancelRef} onClick={onClose}>

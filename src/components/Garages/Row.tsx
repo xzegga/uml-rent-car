@@ -44,48 +44,17 @@ const Row: React.FC<RowProps> = ({ row, removeRow }) => {
 
         <Tr cursor={'pointer'} _hover={{ bg: 'gray.100' }} style={row.data.status === 'Archived' ? stripped : {}}>
 
-            <LinkBox
-                py={1.5} px={1.5}
-                as={Td}
-                onClick={() => {
-                    navigate(`project/${row.id}`);
-                }}
-                cursor={'pointer'}
-                style={{ whiteSpace: 'nowrap' }}
-                _hover={{ bg: 'gray.100' }}
-            >
+            <Td py={1.5} px={1.5}>
                 <VStack textAlign={'left'} alignItems={'flex-start'} ml={2} spacing={1}>
                     <Text fontWeight={'700'}>{row.data.name}</Text>
                     <Text>Capacidad: {row.data.capacity}</Text>
                 </VStack>
 
-            </LinkBox>
-            <LinkBox
-                py={1.5} px={1.5}
-                as={Td}
-                maxW={150}
-                onClick={() => {
-                    navigate(`project/${row.id}`);
-                }}
-                cursor={'pointer'}
-                _hover={{ bg: 'gray.100' }}
-            >
+            </Td>
+            <Td  py={1.5} px={1.5} maxW={'220px'}>
                 <Text>{row.data.location}</Text>
-            </LinkBox>
-
-            <LinkBox
-                py={1.5} px={1.5}
-                as={Td}
-                maxW={20}
-                onClick={() => {
-                    navigate(`project/${row.id}`);
-                }}
-                cursor={'pointer'}
-                _hover={{ bg: 'gray.100' }}
-            >
-                
-            </LinkBox>
-            <Td px={2}>
+            </Td>
+            <Td py={1.5} px={1.5}>
                 <Flex>
                     <Box>
                         {metaData?.image !== '' ? (

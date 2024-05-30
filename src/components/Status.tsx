@@ -8,10 +8,11 @@ interface StatusProps {
 const Status: React.FC<StatusProps> = ({ status }) => {
 
     const color = (status: string) => {
-        if (status === 'Received') return 'cyan'
-        if (status === 'In Progress') return 'yellow'
-        if (status === 'Completed') return 'green'
-        if (status === 'On Hold') return 'red'
+        if (status === 'Recibido') return 'cyan'
+        if (status === 'En Progreso') return 'yellow'
+        if (status === 'Aprovada') return 'green'
+        if (status === 'Completada') return 'green'
+        if (status === 'En Espera') return 'red'
     }
 
     return (

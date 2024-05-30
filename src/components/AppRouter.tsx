@@ -18,6 +18,8 @@ import ProtectedRoute from './ProtectedRoute';
 import AddGarage from '../pages/admin/AddGarage';
 import Garages from '../pages/admin/Garages';
 import Vehicles from '../pages/admin/Vehicles';
+import Profile from '../pages/client/Profile';
+import ProfileAdm from '../pages/admin/Profile';
 
 const AppRouter: React.FC = () => {
     return (
@@ -34,6 +36,7 @@ const AppRouter: React.FC = () => {
                         <Route path="client/rentals" element={<Dashboard />} />
                         <Route path="client/rentals/:id" element={<ReservationDetail />} />
                         <Route path="client/rentals/add/:id" element={<AddReservation />} />
+                        <Route path="client/profile" element={<Profile />} />
                     </Route>
                     <Route path="/" element={<ProtectedRoute allowedRoles={ROLES.Admin} />} >
 
@@ -43,6 +46,7 @@ const AppRouter: React.FC = () => {
                         <Route path="admin/rentals/:id" element={<ReservationDetail />} />
 
                         <Route path="admin/users" element={<Users />} />
+                        <Route path="admin/users/:id" element={<ProfileAdm />} />
 
                         <Route path="admin/vehicles" element={<Vehicles />} />
                         <Route path="admin/vehicles/add" element={<AddVehicle />} />

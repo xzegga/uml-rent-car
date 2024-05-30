@@ -1,4 +1,8 @@
-export const statuses = ['Recibido', 'En Progreso', 'Completado', 'Archivado', 'En Espera', 'Cotizado'];
+export const statuses = [
+    'Recibido', 'Aprovada', 'En Progreso', 
+    'Completado', 'Archivado', 'En Espera', 
+    'Cotizado'];
+
 export const allStatuses = ['Activo', ...statuses];
 export const monthNames = [
     { name: 'Enero', value: 0 },
@@ -15,5 +19,7 @@ export const monthNames = [
     { name: 'Diciembre', value: 11 }
 ];
 
-export const defaultStatuses = ['Recibido', 'En Progreso', 'En Espera'];
+export const defaultStatuses = [
+    'Recibido', 'En Progreso', 'En Espera', 'Aprovada'
+];
 export const billingStatuses = ['En Progreso', 'Completado', 'Archivado'];
