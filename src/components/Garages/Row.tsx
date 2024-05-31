@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
 import { RiDeleteBin6Line } from 'react-icons/ri';
-import { useNavigate } from 'react-router-dom';
 
 import {
-    Box, Text, Flex, IconButton, LinkBox, Td, Tr,
+    Box, Text, Flex, IconButton, Td, Tr,
     Image,
     VStack
 } from '@chakra-ui/react';
@@ -22,7 +21,6 @@ const stripped = {
 };
 
 const Row: React.FC<RowProps> = ({ row, removeRow }) => {
-    const navigate = useNavigate();
     const [metaData, setMetadata] = React.useState<any>();
 
     useEffect(() => {

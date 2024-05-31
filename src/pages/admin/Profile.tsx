@@ -8,7 +8,6 @@ import {
 import { RibbonContainer, Ribbon } from "react-ribbons";
 import { NavLink, useParams } from "react-router-dom";
 import Navigation from "../../components/Navigation";
-import { useStore } from "../../hooks/useGlobalStore";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import useHandleFormControls from "../../hooks/handleFormControls";
@@ -20,7 +19,6 @@ import { getUserDataById } from "../../data/users";
 
 export default function ProfileAdm() {
     const { id } = useParams();
-    const { currentUser } = useStore();
     const [user, setUser] = useState<User>()
     const { validate } = useAuth();
 
@@ -41,8 +39,6 @@ export default function ProfileAdm() {
     };
 
     const {
-        handleDate,
-        handleTextArea,
         handleInput
     } = useHandleFormControls(user, setUser);
 
